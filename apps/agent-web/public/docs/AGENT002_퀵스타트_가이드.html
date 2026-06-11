@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>AGENT002 퀵 스타트 가이드</title>
+<style>
+  :root {
+    --primary: #3B82F6;
+    --primary-dark: #1d4ed8;
+    --accent: #0ea5e9;
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --bg-code: #0D1117;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.75;
+    margin: 0;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 32px 96px; }
+  header.cover {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+    padding: 56px 32px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 40px;
+  }
+  header.cover .eyebrow { font-size: 13px; letter-spacing: 0.2em; opacity: 0.85; text-transform: uppercase; margin-bottom: 12px; }
+  header.cover h1 { font-size: 38px; margin: 0 0 8px; font-weight: 800; letter-spacing: -0.02em; }
+  header.cover .sub { font-size: 18px; opacity: 0.95; margin: 0; }
+  header.cover .meta { margin-top: 18px; font-size: 13px; opacity: 0.9; }
+  h2 {
+    font-size: 25px;
+    margin-top: 52px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    color: var(--primary-dark);
+  }
+  h3 { font-size: 18px; margin-top: 28px; margin-bottom: 8px; }
+  h4 { font-size: 15px; margin-top: 18px; margin-bottom: 6px; color: var(--primary-dark); }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 5px 0; }
+  code {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--bg-code);
+    color: #e2e8f0;
+    padding: 14px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  pre code { background: transparent; border: none; color: inherit; padding: 0; }
+  .toc {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .toc h2 { margin: 0 0 10px; border: none; padding: 0; font-size: 16px; color: var(--text); }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc a { color: var(--primary); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .step {
+    background: var(--bg-soft);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .step .step-no {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    border-radius: 999px;
+    padding: 1px 10px;
+    font-weight: 700;
+    margin-right: 8px;
+    font-size: 12px;
+    vertical-align: middle;
+  }
+  .callout { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 14px; }
+  .callout.tip { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+  .callout.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+  .callout strong { display: block; margin-bottom: 4px; }
+  .badge {
+    display: inline-block;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+  }
+  .badge.builder { background: var(--primary); }
+  .badge.user { background: var(--accent); }
+  .badge.admin { background: #7c3aed; }
+  .placeholder-img {
+    border: 2px dashed #cbd5e1;
+    background: #f1f5f9;
+    color: #64748b;
+    text-align: center;
+    padding: 32px 16px;
+    border-radius: 12px;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  .placeholder-img .pi-title { font-weight: 700; color: #475569; font-size: 14px; margin-bottom: 4px; }
+  .placeholder-img .pi-path { font-family: monospace; color: #6b7280; font-size: 12px; margin-top: 6px; }
+  figure.doc-figure { margin: 18px 0; padding: 0; }
+  figure.doc-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08); }
+  figure.doc-figure figcaption { margin-top: 8px; font-size: 12.5px; color: var(--muted); text-align: center; }
+  figure.doc-figure figcaption .fc-path { font-family: "SF Mono", Menlo, Consolas, monospace; color: #94a3b8; margin-left: 6px; font-size: 11.5px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--bg-soft); font-weight: 600; }
+  kbd { background: #1f2937; color: white; padding: 1px 6px; border-radius: 4px; font-size: 0.85em; font-family: "SF Mono", Menlo, monospace; }
+  .pill { display: inline-block; background: #1A2133; color: #E9ECF3; padding: 1px 8px; border-radius: 6px; font-size: 0.85em; font-family: "SF Mono", Menlo, monospace; margin: 0 2px; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; text-align: center; }
+  .brand-agent002 { font-weight: inherit; letter-spacing: 0.01em; }
+  .brand-agent002 > .num { font-style: italic; color: #C8102E; font-weight: inherit; }
+  header.cover .brand-agent002 > .num { color: #FCA5A5; }
+  pre .brand-agent002 > .num { color: #F87171; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="cover">
+    <div class="eyebrow">QUICK START GUIDE</div>
+    <h1><span class="brand-agent002">AGENT<span class="num">002</span></span></h1>
+    <p class="sub">AI Agent Management Platform · 사이드바 표기 "<span class="brand-agent002">AGENT<span class="num">002</span></span>"</p>
+    <div class="meta">URL 예: <code style="background:rgba(255,255,255,.15);color:white;border:none">http://dweax.iptime.org:28002/</code></div>
+  </header>
+
+  <div class="toc">
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#intro"><span class="brand-agent002">AGENT<span class="num">002</span></span>란?</a></li>
+      <li><a href="#login">로그인하기</a></li>
+      <li><a href="#layout">화면 구성 한눈에 보기</a></li>
+      <li><a href="#concept">핵심 개념 (하네스·프롬프트·스킬·도구·멀티에이전트)</a></li>
+      <li><a href="#build">5분 만에 첫 에이전트 만들기</a></li>
+      <li><a href="#test">캔버스에서 테스트하기</a></li>
+      <li><a href="#deploy">배포 및 API 키 발급</a></li>
+      <li><a href="#use">챗 클라이언트(/client)에서 사용하기</a></li>
+      <li><a href="#next">다음 단계</a></li>
+    </ol>
+  </div>
+
+  <h2 id="intro">1. <span class="brand-agent002">AGENT<span class="num">002</span></span>란?</h2>
+  <p>
+    <strong><span class="brand-agent002">AGENT<span class="num">002</span></span></strong>는 LangGraph 기반의 에이전트 하네스를 시각적으로 구성하고,
+    빌더 내부에서 바로 실행·디버깅한 뒤, 환경(Environment)별로 배포해 챗 클라이언트에서
+    사용할 수 있는 엔터프라이즈 AI Agent Management Platform입니다.
+    좌측 사이드바의 로고에는 <strong>"<span class="brand-agent002">AGENT<span class="num">002</span></span>"</strong>로 표기됩니다.
+  </p>
+  <p>이 가이드는 두 종류의 독자를 모두 다룹니다.</p>
+  <ul>
+    <li><span class="badge builder">빌더</span> 에이전트를 직접 만드는 사용자 (대시보드 영역)</li>
+    <li><span class="badge user">사용자</span> 배포된 에이전트를 사용하는 일반 사용자 (<code>/client</code> 영역)</li>
+  </ul>
+
+  <h2 id="login">2. 로그인하기</h2>
+  <p>웹 브라우저에서 서비스 주소(예: <code>http://dweax.iptime.org:28002/</code>)에 접속하면 자동으로 <code>/login</code>으로 이동합니다.</p>
+
+  <figure class="doc-figure">
+    <img src="/docs/screenshots/login.png" alt="로그인 화면">
+    <figcaption>로그인 화면 — 좌측에 파란 그라데이션 로고 + "<span class="brand-agent002">AGENT<span class="num">002</span></span>" 타이틀, 중앙 카드에 "로그인" 헤더<span class="fc-path">/login</span></figcaption>
+  </figure>
+
+  <div class="step">
+    <span class="step-no">1</span>
+    <strong>이메일</strong> 필드에 계정 이메일을 입력합니다. (예: <code>user@example.com</code>)
+  </div>
+  <div class="step">
+    <span class="step-no">2</span>
+    <strong>비밀번호</strong> 필드에 비밀번호를 입력합니다. 우측 눈 아이콘으로 비밀번호 표시/숨김 전환이 가능합니다.
+  </div>
+  <div class="step">
+    <span class="step-no">3</span>
+    파란색 <strong>[로그인]</strong> 버튼을 누르거나 <kbd>Enter</kbd>를 누릅니다. 인증 성공 시 자동으로 <code>/dashboard</code>로 이동합니다.
+  </div>
+
+  <div class="callout tip">
+    <strong>비밀번호를 잊으셨나요?</strong>
+    로그인 카드 하단의 [비밀번호를 잊으셨나요?] 링크를 누르면
+    [비밀번호 찾기 → 메일 전송 → 비밀번호 재설정] 3단계 흐름이 제공됩니다.
+    새 비밀번호는 6자 이상이어야 합니다.
+  </div>
+
+  <h2 id="layout">3. 화면 구성 한눈에 보기</h2>
+  <p>로그인 후에는 좌측 사이드바와 우측 콘텐츠 영역으로 구성됩니다.</p>
+
+  <h3>3.1 빌더(관리자) 사이드바 — <span class="badge builder">빌더</span></h3>
+  <pre><code>┌─ ◆ AGENT002  v1.0.0
+│
+│  MAIN
+│   ▸ Dashboard
+│   ▸ Agents              ← 에이전트 만들고 관리
+│   ▸ Workflows  [준비 중]
+│   ▸ Tools               ← 도구·MCP·Builtin
+│   ▸ Skills              ← 스킬 작성/관리
+│   ▸ Knowledge  [준비 중]
+│   ▸ Evaluation [준비 중]
+│
+│   ▸ Usage
+│   ▸ Monitoring
+│   ▸ Providers           ← LLM 프로바이더/API 키
+│   ▸ Settings            ← 내 프로필
+│
+│  ADMIN (admin 권한만)
+│   ▸ Users
+│   ▸ Slack
+│
+└─ [내 프로필] [◀ 접기] [⎋ 로그아웃]</code></pre>
+
+  <h3>3.2 챗 클라이언트 사이드바 — <span class="badge user">사용자</span></h3>
+  <p>URL 끝이 <code>/client/...</code>이면 사용자용 챗 클라이언트입니다.</p>
+  <pre><code>┌─ ● Agent Client
+│
+│   ▸ 에이전트       ← 배포된 활성 에이전트 목록
+│   ▸ 도구 관리       ← 내 자격 증명 관리
+│   ▸ 채팅 히스토리   ← 과거 대화 이어가기
+│
+│   🔍 [검색]
+│
+│   대화 목록 (활성)
+│   ─ "지난 회의 요약…"  · 마케팅 비서 · 5/27 14:33
+│   ─ "이메일 초안…"     · 헬프데스크 · 5/26 09:12
+│   …
+│
+└─ [내 이름] [⎋ 로그아웃]</code></pre>
+
+  <h2 id="concept">4. 핵심 개념</h2>
+  <table>
+    <thead><tr><th>용어</th><th>설명</th><th>UI 위치</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Agent (에이전트)</strong></td><td>하나의 LangGraph 기반 에이전트. 단일/멀티에이전트 모두 포함.</td><td><code>/agents</code></td></tr>
+      <tr><td><strong>Main Agent</strong></td><td>하네스의 진입점. 사용자의 요청을 받아 응답 또는 서브 에이전트에 위임.</td><td>캔버스 좌상단 노드</td></tr>
+      <tr><td><strong>Sub Agent</strong></td><td>Main Agent가 호출하는 보조 에이전트(멀티에이전트 구성용).</td><td>캔버스에 추가</td></tr>
+      <tr><td><strong>System Prompt</strong></td><td>에이전트의 역할·규칙을 정의하는 본문. Monaco 에디터로 편집.</td><td>설정 패널 → 프롬프트</td></tr>
+      <tr><td><strong>Skill</strong></td><td>지시문(instructions) + 파일 묶음으로 정의된 작업 절차.</td><td>좌측 메뉴 Skills</td></tr>
+      <tr><td><strong>Tool</strong></td><td>Custom / MCP / Builtin 3종. 외부 시스템 호출용.</td><td>좌측 메뉴 Tools</td></tr>
+      <tr><td><strong>Brain Model</strong></td><td>이 에이전트가 사용할 LLM 모델. Providers 메뉴에서 활성화한 모델 중 선택.</td><td>Main Agent 모달 / 모델 탭</td></tr>
+      <tr><td><strong>Deployment</strong></td><td>특정 환경에 게시된 에이전트 버전. <code>publicPath</code> + API 키로 호출.</td><td><code>/agents/[id]/deployments</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="build">5. 5분 만에 첫 에이전트 만들기 <span class="badge builder">빌더</span></h2>
+
+  <div class="step">
+    <span class="step-no">1</span>
+    <strong>좌측 메뉴 [Agents]를 클릭</strong>합니다. 우측 상단에 [템플릿으로 시작 (준비 중)], [Import], <strong>[+ New Agent]</strong> 버튼이 표시됩니다.
+  </div>
+
+  <figure class="doc-figure">
+    <img src="/docs/screenshots/agents-list.png" alt="Agents 목록 화면">
+    <figcaption>Agents 목록 화면 — 헤더 "Agents — LangGraph 기반 자율 에이전트 및 팀을 관리합니다" 와 탭(Agents / Teams · Run History · A/B 비교 — 준비 중)<span class="fc-path">/agents</span></figcaption>
+  </figure>
+
+  <div class="step">
+    <span class="step-no">2</span>
+    파란색 <strong>[+ New Agent]</strong> 버튼을 누르면 "New Agent" 모달이 열립니다.
+    <ul>
+      <li><strong>에이전트 이름</strong>: 예) "마케팅 비서"</li>
+      <li><strong>설명</strong>: 에이전트의 역할이나 목적</li>
+    </ul>
+    <strong>[에이전트 생성]</strong> 버튼을 누르면 자동으로 빌더 캔버스(<code>/agents/[agentId]</code>)로 이동합니다.
+    이때 systemPrompt 기본값은 <code>"You are a helpful assistant."</code>, 모델 기본값은 <code>gpt-4o-mini</code>입니다.
+  </div>
+
+  <div class="step">
+    <span class="step-no">3</span>
+    <strong>캔버스 좌상단</strong>에 "Main Agent" 노드가 표시됩니다. 우측 패널은 기본적으로 [Settings] 모드입니다.
+  </div>
+
+  <figure class="doc-figure">
+    <img src="/docs/screenshots/agent-builder.png" alt="Agent Builder 캔버스">
+    <figcaption>Agent Builder 캔버스 — 상단 툴바([← Agents] · 에이전트명 · "미저장" 배지 · [🚀 배포] [⚙ Main Agent] [▶ 실행] [💾 저장]) / 좌: React Flow 캔버스 · 우: 설정 패널(기본 · 프롬프트 · 도구 · Skills · 모델 · I/O · 가드레일 · Handoff)<span class="fc-path">/agents/[agentId]</span></figcaption>
+  </figure>
+
+  <div class="step">
+    <span class="step-no">4</span>
+    <strong>우측 패널 → [프롬프트] 탭</strong>으로 이동해 system prompt를 작성합니다.
+    Monaco 에디터에서 자유롭게 입력하고, 필요하면 Few-shot 메시지도 추가할 수 있습니다.
+    저장 후 자동으로 버전이 기록되어 [Versions]에서 되돌릴 수 있습니다.
+  </div>
+
+  <div class="step">
+    <span class="step-no">5</span>
+    <strong>우측 패널 → [모델] 탭</strong>에서 Brain Model · Temperature(0~2) · Max Tokens(256~32768)을 설정합니다.
+  </div>
+
+  <div class="step">
+    <span class="step-no">6</span>
+    <strong>[도구] 탭과 [Skills] 탭</strong>에서 필요한 항목을 체크해 활성화합니다.
+    도구는 Custom · MCP · Builtin 그룹으로 묶여 있고, 도구별 권한(allow/ask/deny)을 별도 설정할 수 있습니다.
+  </div>
+
+  <div class="step">
+    <span class="step-no">7</span>
+    <strong>멀티에이전트로 만들고 싶다면</strong> 캔버스 빈 곳을 우클릭(또는 캔버스의 + 아이콘)으로 Sub Agent 노드를 추가하고,
+    Main Agent와 엣지로 연결합니다. 추가된 Sub Agent도 동일하게 우측 패널에서 프롬프트·모델·도구·Skills를 설정합니다.
+  </div>
+
+  <div class="step">
+    <span class="step-no">8</span>
+    상단 우측의 <strong>[💾 저장]</strong> 버튼을 누르면 변경 사항이 저장됩니다. "미저장" 배지가 사라지면 완료입니다.
+  </div>
+
+  <div class="callout tip">
+    <strong>Tip — Agent Assistant 패널</strong>
+    캔버스 하단에는 Agent Assistant 패널이 있어, 자연어로 "프롬프트를 정중한 어투로 다듬어줘"처럼
+    요청하면 변경 제안(diff)이 카드로 떠 클릭 한 번으로 적용할 수 있습니다.
+  </div>
+
+  <h2 id="test">6. 캔버스에서 테스트하기</h2>
+  <div class="step">
+    <span class="step-no">1</span>
+    캔버스 상단의 파란색 <strong>[▶ 실행]</strong> 버튼을 누릅니다.
+  </div>
+  <div class="step">
+    <span class="step-no">2</span>
+    우측 패널이 [Debug] 모드로 전환되며 입력창이 표시됩니다. 사용자가 보낼 법한 질문을 입력하고 전송합니다.
+  </div>
+  <div class="step">
+    <span class="step-no">3</span>
+    실행되면 캔버스의 노드와 엣지가 <strong>파란색으로 활성화</strong>되며 현재 어디까지 진행됐는지 시각적으로 표시됩니다.
+    오류가 나면 빨간색으로 표시됩니다.
+  </div>
+  <div class="step">
+    <span class="step-no">4</span>
+    [Debug] 패널에서 단계별 이벤트(StepFlowEvent)·도구 호출·토큰 사용량을 확인할 수 있습니다.
+  </div>
+
+  <div class="callout">
+    <strong>에이전트 목록에서 빠른 채팅</strong>
+    <code>/agents</code> 목록의 각 카드 우하단 <strong>[Chat]</strong> 버튼을 누르면
+    별도의 채팅 화면(<code>/agents/[agentId]/chat</code>)에서 빠르게 대화 테스트가 가능합니다.
+  </div>
+
+  <h2 id="deploy">7. 배포 및 API 키 발급</h2>
+  <p>테스트 결과가 만족스러우면 배포를 진행합니다.</p>
+
+  <div class="step">
+    <span class="step-no">1</span>
+    캔버스 상단 우측의 <strong>[🚀 배포]</strong> 버튼을 누르면 배포 관리 페이지(<code>/agents/[agentId]/deployments</code>)로 이동합니다.
+  </div>
+
+  <figure class="doc-figure">
+    <img src="/docs/screenshots/deployments.png" alt="배포 관리 화면">
+    <figcaption>배포 관리 화면 — 좌측 "새 배포" 카드(환경 선택 / 릴리스 노트 / [배포 실행]) · 하단 "배포 이력"(버전 · 환경 · 상태 · publicPath · 설명 · 배포 시각)<span class="fc-path">/agents/[agentId]/deployments</span></figcaption>
+  </figure>
+
+  <div class="step">
+    <span class="step-no">2</span>
+    "새 배포" 카드에서 <strong>환경(Environment)</strong>을 선택합니다. (예: dev / staging / prod)
+  </div>
+  <div class="step">
+    <span class="step-no">3</span>
+    "설명(릴리스 노트)"에 변경 내용을 적고 <strong>[배포 실행]</strong>을 누르면 "v{version} 배포 완료" 토스트가 뜨고
+    "배포 이력" 테이블에 새 행이 추가됩니다.
+  </div>
+  <div class="step">
+    <span class="step-no">4</span>
+    배포 이력에서 해당 행의 <strong>publicPath</strong>를 확인합니다. 옆의 복사 아이콘으로 한 번에 복사 가능합니다.
+  </div>
+  <div class="step">
+    <span class="step-no">5</span>
+    REST API로 호출하려면 <strong>[+ API 키 발급]</strong>으로 키를 발급합니다.
+    <strong>발급된 키는 노란색 카드로 한 번만 표시</strong>되며 이후에는 다시 볼 수 없으니 즉시 안전한 곳에 저장하세요.
+    함께 표시되는 curl 예시(thread 생성 → 메시지 전송)도 그대로 사용할 수 있습니다.
+  </div>
+
+  <div class="callout warn">
+    <strong>API 키 보안</strong>
+    한 번 표시된 키는 다시 조회 불가합니다. 의심이 들면 즉시 [폐기]하고 새로 발급하세요.
+  </div>
+
+  <h2 id="use">8. 챗 클라이언트(/client)에서 사용하기 <span class="badge user">사용자</span></h2>
+  <p>배포된 에이전트는 같은 도메인의 <code>/client</code> 경로에서 일반 사용자가 사용할 수 있습니다.</p>
+
+  <div class="step">
+    <span class="step-no">1</span>
+    <code>/client</code> 또는 <code>/client/login</code>에 접속해 로그인합니다.
+  </div>
+  <div class="step">
+    <span class="step-no">2</span>
+    좌측 사이드바 <strong>[에이전트]</strong> 메뉴에 "배포된 활성 에이전트"가 카드로 표시됩니다.
+    각 카드에는 환경 색상의 봇 아이콘, 이름, <code>v{version} · {환경명}</code>, 설명, 대화 시작 예시(starters)와
+    구성 칩(sub / skill / tool 개수)이 보입니다.
+  </div>
+  <div class="step">
+    <span class="step-no">3</span>
+    카드를 클릭하면 상세 페이지(<code>/client/agents/[slug]</code>)가 열립니다.
+    <ul>
+      <li>자격 증명이 모두 준비됐으면 녹색 "준비 완료" 카드가 뜹니다.</li>
+      <li>누락된 자격 증명이 있으면 <strong>[도구 관리]</strong>로 이동하라는 안내가 표시됩니다.</li>
+    </ul>
+  </div>
+  <div class="step">
+    <span class="step-no">4</span>
+    상세 페이지에서 <strong>[채팅 시작]</strong>을 누르면 채팅 화면이 열리고 자연어로 대화하면 됩니다.
+  </div>
+
+  <div class="callout tip">
+    <strong>이력 이어가기</strong>
+    좌측 사이드바 [채팅 히스토리]에서 이전 대화를 클릭하면 같은 thread로 이어집니다.
+    상단의 검색창으로 제목/에이전트명 검색이 가능하고, 항목을 우클릭하면 [삭제]가 나옵니다.
+  </div>
+
+  <h2 id="next">9. 다음 단계</h2>
+  <p>핵심 흐름을 익히셨다면 <strong>"<span class="brand-agent002">AGENT<span class="num">002</span></span> 사용자 메뉴얼"(표준 버전)</strong>에서 다음 내용을 더 자세히 확인할 수 있습니다.</p>
+  <ul>
+    <li>Settings 패널의 8개 탭(기본/프롬프트/도구/Skills/모델/I/O/가드레일/Handoff) 사용법</li>
+    <li>Skills 페이지의 instructions 작성·파일 첨부·내보내기 / 가져오기</li>
+    <li>Tools 페이지의 Custom Tool Wizard, MCP 서버 등록, Builtin Tools</li>
+    <li>Providers 페이지에서 LLM API 키 등록 및 모델 활성화</li>
+    <li>배포 환경(Environment) 관리, 다중 배포 운영</li>
+    <li>Monitoring · Usage 대시보드 활용</li>
+    <li>관리자 전용 Users / Slack 연동</li>
+  </ul>
+
+  <footer>
+    <span class="brand-agent002">AGENT<span class="num">002</span></span> Quick Start Guide · v1.1
+  </footer>
+
+</div>
+</body>
+</html>

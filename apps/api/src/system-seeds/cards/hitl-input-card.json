@@ -1,0 +1,36 @@
+{
+  "cardId": "hitl-input-card",
+  "version": 1,
+  "name": "HITL 기본 승인 카드",
+  "category": "hitl",
+  "targetTools": [],
+  "argSchema": null,
+  "payload": {
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.5",
+    "body": [
+      { "type": "Custom.HitlHeader" },
+      { "type": "Custom.HitlArgsView" },
+      { "type": "Custom.HitlArgsEditor" },
+      {
+        "type": "Custom.HitlActions",
+        "labels": {
+          "reject": "거부",
+          "nlEdit": "자연어로 수정",
+          "directEdit": "직접 수정",
+          "approve": "허용"
+        }
+      }
+    ]
+  },
+  "sampleData": {
+    "interactionId": "sample-interaction-id",
+    "toolName": "write_file",
+    "toolArgs": {
+      "path": "notes.md",
+      "content": "hello"
+    },
+    "allowedDecisions": ["approve", "edit", "reject"]
+  }
+}

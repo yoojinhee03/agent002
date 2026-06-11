@@ -1,0 +1,706 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── 다크 테마 시맨틱 토큰 ─────────────────────────────────── */
+:root,
+.dark {
+  /* 배경 계층 */
+  --color-bg:           #14161f;
+  --color-surface:      #1a1d28;
+  --color-surface-2:    #232634;
+  --color-surface-3:    #2a2e3e;
+
+  /* 경계선 계층 */
+  --color-border:        #2e3242;
+  --color-border-strong: #3d4256;
+  --color-border-subtle: #22252f;
+
+  /* 텍스트 계층 */
+  --color-fg:         #eef0f5;
+  --color-fg-muted:   #a8aec0;
+  --color-fg-subtle:  #6b7180;
+
+  /* 액센트 */
+  --color-primary:    #4f7cf8;
+  --color-primary-fg: #ffffff;
+
+  /* 상태 색상 */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger:  #f87171;
+  --color-info:    #60a5fa;
+
+  /* 폰트 크기 토큰 */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --line-height-tight: 1.35;
+  --line-height-normal: 1.55;
+
+  /* 그림자 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ── 라이트 테마 토큰 ──────────────────────────────────────── */
+.light {
+  --color-bg:           #f4f6fa;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #f0f3f8;
+  --color-surface-3:    #ffffff;
+
+  --color-border:        #d6dce8;
+  --color-border-strong: #b4bccd;
+  --color-border-subtle: #e8ecf2;
+
+  --color-fg:         #14182a;
+  --color-fg-muted:   #4a5168;
+  --color-fg-subtle:  #7a8197;
+
+  --color-primary:    #1a73e8;
+  --color-primary-fg: #ffffff;
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger:  #dc2626;
+  --color-info:    #2563eb;
+}
+
+@theme inline {
+  /* 시맨틱 계층 — CSS 변수 → Tailwind 유틸리티 */
+  --color-bg:           var(--color-bg);
+  --color-surface:      var(--color-surface);
+  --color-surface-2:    var(--color-surface-2);
+  --color-surface-3:    var(--color-surface-3);
+
+  --color-border:        var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-border-subtle: var(--color-border-subtle);
+
+  --color-fg:         var(--color-fg);
+  --color-fg-muted:   var(--color-fg-muted);
+  --color-fg-subtle:  var(--color-fg-subtle);
+
+  --color-primary:    var(--color-primary);
+  --color-primary-fg: var(--color-primary-fg);
+
+  /* 기존 shadcn 토큰 — 시맨틱 변수로 매핑 */
+  --color-background:    var(--color-bg);
+  --color-foreground:    var(--color-fg);
+  --color-card:          var(--color-surface);
+  --color-card-foreground: var(--color-fg);
+  --color-popover:       var(--color-surface-3);
+  --color-popover-foreground: var(--color-fg);
+  --color-muted:         var(--color-surface-2);
+  --color-muted-foreground: var(--color-fg-muted);
+  --color-accent:        var(--color-surface-2);
+  --color-accent-foreground: var(--color-fg);
+  --color-destructive:   oklch(0.577 0.245 27.33);
+  --color-destructive-foreground: oklch(0.985 0 0);
+  --color-input:         var(--color-border);
+  --color-ring:          var(--color-border-strong);
+  --color-secondary:     var(--color-surface-2);
+  --color-secondary-foreground: var(--color-fg);
+
+  --color-chart-1: oklch(0.488 0.243 264.38);
+  --color-chart-2: oklch(0.696 0.17 162.48);
+  --color-chart-3: oklch(0.769 0.188 70.08);
+  --color-chart-4: oklch(0.627 0.265 303.9);
+  --color-chart-5: oklch(0.645 0.246 16.44);
+
+  --color-sidebar:          var(--color-bg);
+  --color-sidebar-foreground: var(--color-fg);
+  --color-sidebar-primary: var(--color-primary);
+  --color-sidebar-primary-foreground: var(--color-primary-fg);
+  --color-sidebar-accent: var(--color-surface-2);
+  --color-sidebar-accent-foreground: var(--color-fg);
+  --color-sidebar-border: var(--color-border);
+  --color-sidebar-ring:   var(--color-border-strong);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-normal);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ── 공통 컴포넌트 alias ─────────────────────────────────────── */
+@layer components {
+  .card {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: 1.25rem;
+  }
+
+  .card-hover {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    padding: 1.25rem;
+    transition: background-color 0.15s;
+  }
+  .card-hover:hover {
+    background-color: var(--color-surface-2);
+  }
+
+  .input {
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-fg);
+    font-size: var(--font-size-md);
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+  .input::placeholder {
+    color: var(--color-fg-subtle);
+  }
+  .input option {
+    background-color: var(--color-surface);
+    color: var(--color-fg);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    padding: 0 1rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    transition: background-color 0.15s, opacity 0.15s;
+  }
+
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: var(--radius-md);
+  }
+
+  .section-title {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.075em;
+    color: var(--color-fg-muted);
+  }
+}
+
+/* ── Phase 10: Client UI Design Tokens (라이트 테마 통합) ───── */
+:root {
+  --client-bg: #f0f4f9;
+  --client-bg-2: #ffffff;
+  --client-panel: #ffffff;
+  --client-panel-2: #f0f4f9;
+  --client-border: #dde3ee;
+  --client-border-2: #c8d0e0;
+  --client-text: #1a2138;
+  --client-muted: #5d6a8a;
+  --client-muted-2: #8a96b8;
+  --client-primary: #1a73e8;
+  --client-cyan: #00acc1;
+  --client-green: #34a853;
+  --client-pink: #d63384;
+  --client-orange: #f57c00;
+  --client-purple: #7c4dff;
+  --client-user-bubble: #e8eaf0;
+  --client-user-text: #1a2138;
+}
+
+.client-app {
+  background: var(--client-bg);
+  color: var(--client-text);
+  min-height: 100vh;
+}
+
+.client-panel {
+  background: var(--client-panel);
+  border: 1px solid var(--client-border);
+  border-radius: 0.75rem;
+}
+
+.client-panel-2 {
+  background: var(--client-panel-2);
+  border: 1px solid var(--client-border-2);
+  border-radius: 0.75rem;
+}
+
+/* ── Agent Builder form inputs (시맨틱 토큰 반영) ─────────── */
+.input-dark {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.5rem;
+  color: var(--color-fg);
+  font-size: var(--font-size-sm);
+  padding: 0.375rem 0.625rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input-dark:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+.input-dark::placeholder {
+  color: var(--color-fg-subtle);
+}
+.input-dark option {
+  background: var(--color-surface);
+  color: var(--color-fg);
+}
+
+/* ── 얇은 스크롤바 ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-fg-subtle);
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-fg-muted);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+/* Markdown prose styling for dark theme */
+.prose-invert-custom h1 { font-size: 1.5em; font-weight: 700; margin: 0.5em 0 0.3em; color: var(--color-fg); }
+.prose-invert-custom h2 { font-size: 1.25em; font-weight: 700; margin: 0.5em 0 0.3em; color: var(--color-fg); }
+.prose-invert-custom h3 { font-size: 1.1em; font-weight: 600; margin: 0.5em 0 0.3em; color: var(--color-fg); }
+.prose-invert-custom p { margin: 0.4em 0; }
+.prose-invert-custom strong { color: var(--color-fg); font-weight: 600; }
+.prose-invert-custom em { color: var(--color-fg-muted); font-style: italic; }
+.prose-invert-custom code {
+  background: var(--color-surface-2);
+  color: #a78bfa;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: ui-monospace, monospace;
+}
+.prose-invert-custom pre {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.prose-invert-custom pre code {
+  background: none;
+  padding: 0;
+  color: var(--color-fg-muted);
+}
+.prose-invert-custom blockquote {
+  border-left: 3px solid #3b82f6;
+  padding-left: 12px;
+  margin: 0.5em 0;
+  color: var(--color-fg-muted);
+  font-style: italic;
+}
+.prose-invert-custom ul { list-style: disc; padding-left: 1.5em; margin: 0.3em 0; }
+.prose-invert-custom ol { list-style: decimal; padding-left: 1.5em; margin: 0.3em 0; }
+.prose-invert-custom li { margin: 0.15em 0; }
+.prose-invert-custom hr { border: none; border-top: 1px solid var(--color-border); margin: 0.8em 0; }
+.prose-invert-custom a { color: #3b82f6; text-decoration: underline; }
+.prose-invert-custom table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+.prose-invert-custom th, .prose-invert-custom td {
+  border: 1px solid var(--color-border);
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.9em;
+}
+.prose-invert-custom th { background: var(--color-surface-2); color: var(--color-fg); font-weight: 600; }
+
+/* Markdown prose styling for client light theme */
+.prose-client h1 { font-size: 1.4em; font-weight: 700; margin: 0.6em 0 0.3em; color: var(--client-text); }
+.prose-client h2 { font-size: 1.2em; font-weight: 700; margin: 0.6em 0 0.3em; color: var(--client-text); }
+.prose-client h3 { font-size: 1.05em; font-weight: 600; margin: 0.5em 0 0.25em; color: var(--client-text); }
+.prose-client p { margin: 0.4em 0; }
+.prose-client strong { color: var(--client-text); font-weight: 600; }
+.prose-client em { font-style: italic; opacity: 0.85; }
+.prose-client code {
+  background: rgba(0,0,0,0.06);
+  color: #1a73e8;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: ui-monospace, monospace;
+}
+.prose-client pre {
+  background: rgba(0,0,0,0.05);
+  border: 1px solid var(--client-border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.prose-client pre code {
+  background: none;
+  padding: 0;
+  color: var(--client-text);
+}
+.prose-client blockquote {
+  border-left: 3px solid var(--client-primary);
+  padding-left: 12px;
+  margin: 0.5em 0;
+  color: var(--client-muted);
+  font-style: italic;
+}
+.prose-client ul { list-style: disc; padding-left: 1.5em; margin: 0.3em 0; }
+.prose-client ol { list-style: decimal; padding-left: 1.5em; margin: 0.3em 0; }
+.prose-client li { margin: 0.2em 0; }
+.prose-client hr { border: none; border-top: 1px solid var(--client-border); margin: 0.8em 0; }
+.prose-client a { color: var(--client-primary); text-decoration: underline; }
+.prose-client table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+.prose-client th, .prose-client td {
+  border: 1px solid var(--client-border);
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.9em;
+}
+.prose-client th { background: var(--client-panel-2); color: var(--client-text); font-weight: 600; }
+
+/* ── Block Highlight Animation (Premium Settling Effect) ─────────── */
+@keyframes block-settle-impact {
+  0% {
+    transform: scale(1.02);
+    background-color: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.8);
+    box-shadow:
+      0 0 30px rgba(59, 130, 246, 0.2),
+      0 0 0 2px rgba(59, 130, 246, 0.3),
+      inset 0 0 15px rgba(59, 130, 246, 0.1);
+    z-index: 10;
+  }
+  15% {
+    transform: scale(0.995);
+    background-color: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow:
+      0 0 0px transparent,
+      0 0 0 0px transparent,
+      inset 0 0 0px transparent;
+  }
+}
+
+.animate-block-impact {
+  animation: block-settle-impact 6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── AI Generation Effects (Premium & Subtle) ────────────────── */
+@keyframes ai-gradient-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes ai-intense-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px 1px rgba(167, 139, 250, 0.3), inset 0 0 8px rgba(167, 139, 250, 0.1);
+    border-color: rgba(167, 139, 250, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px 3px rgba(167, 139, 250, 0.5), inset 0 0 15px rgba(167, 139, 250, 0.2);
+    border-color: rgba(167, 139, 250, 0.8);
+  }
+}
+
+.ai-generating-border {
+  position: relative;
+  border-color: transparent !important;
+  overflow: hidden;
+}
+
+.ai-generating-border::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899, #f43f5e, #a855f7, #6366f1);
+  background-size: 200% 100%;
+  animation: ai-gradient-flow 2s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ai-generating-glow {
+  animation: ai-intense-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes ai-reveal-fade {
+  0% { opacity: 0; filter: blur(12px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+.ai-content-reveal {
+  animation: ai-reveal-fade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ai-apply-soft-burst {
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: rgba(167, 139, 250, 0.12);
+    box-shadow: 0 0 35px 5px rgba(167, 139, 250, 0.35);
+    border-color: rgba(167, 139, 250, 0.6);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0px 0px transparent;
+  }
+}
+
+.ai-applying-impact {
+  animation: ai-apply-soft-burst 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 100;
+}
+
+@keyframes ai-exit-fade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.98); }
+}
+
+.ai-exit-smooth {
+  animation: ai-exit-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+/* ── Streaming One-Line Effect ────────────────── */
+@keyframes line-slide-up-out {
+  0% { opacity: 0.4; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes line-slide-up-in {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes line-thought-in {
+  0% { opacity: 0; transform: translateX(-10px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+
+.animate-line-slide-up-out {
+  animation: line-slide-up-out 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-line-slide-up-in {
+  animation: line-slide-up-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-line-thought-in {
+  animation: line-thought-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Sub-Agent Running Glow ─────────────────── */
+@keyframes sub-agent-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(34, 211, 238, 0.55),
+      0 0 20px rgba(34, 211, 238, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(34, 211, 238, 0.85),
+      0 0 32px rgba(34, 211, 238, 0.55);
+  }
+}
+
+.sub-agent-node-running {
+  animation: sub-agent-glow 1.6s ease-in-out infinite;
+}
+
+/* ── @xyflow/react Theme Bridge ───────────────────────────────
+   xyflow는 라이트 기본(.react-flow)·다크(.react-flow.dark) 두 셀렉터로
+   자체 -default 변수를 정의한다. 다크 셀렉터가 더 specific 하므로
+   두 셀렉터 모두를 같은 값(테마 토큰)으로 덮어써 양 모드에서 통일된다.
+   값 자체는 var(--color-*) 이므로 .dark/.light 루트 토큰에 따라 자동 전환. */
+.react-flow,
+.react-flow.dark {
+  --xy-background-color-default: var(--color-bg);
+  --xy-background-pattern-dots-color-default: var(--color-border-strong);
+  --xy-background-pattern-lines-color-default: var(--color-border);
+
+  --xy-edge-stroke-default: var(--color-fg-muted);
+  --xy-edge-stroke-width-default: 1.75;
+  --xy-edge-stroke-selected-default: var(--color-primary, #4f7cf8);
+  --xy-connectionline-stroke-default: var(--color-fg-muted);
+  --xy-connectionline-stroke-width-default: 1.75;
+
+  --xy-handle-background-color-default: var(--color-primary, #4f7cf8);
+  --xy-handle-border-color-default: var(--color-bg);
+
+  --xy-controls-button-background-color-default: var(--color-surface);
+  --xy-controls-button-background-color-hover-default: var(--color-surface-2);
+  --xy-controls-button-color-default: var(--color-fg-muted);
+  --xy-controls-button-color-hover-default: var(--color-fg);
+  --xy-controls-button-border-color-default: var(--color-border);
+  --xy-controls-box-shadow-default: var(--shadow-md);
+
+  --xy-minimap-background-color-default: var(--color-surface);
+  --xy-minimap-mask-background-color-default: rgba(0, 0, 0, 0.25);
+
+  --xy-attribution-background-color-default: transparent;
+
+  --xy-node-background-color-default: var(--color-bg);
+  --xy-node-border-default: 1px solid var(--color-border);
+  --xy-node-color-default: var(--color-fg);
+}
+
+/* xyflow style.css 가 component 내부 import 라 globals 보다 나중에 로드되어
+   --xy-* 변수 override 가 묻힌다. 직접 stroke 를 토큰으로 지정해 우회. */
+.react-flow .react-flow__edge .react-flow__edge-path,
+.react-flow .react-flow__connectionline {
+  stroke: var(--color-fg-muted);
+  stroke-width: 1.75;
+}
+.react-flow .react-flow__edge.selected .react-flow__edge-path,
+.react-flow .react-flow__edge:focus .react-flow__edge-path,
+.react-flow .react-flow__edge:focus-visible .react-flow__edge-path {
+  stroke: var(--color-primary);
+  stroke-width: 2;
+}
+.react-flow .react-flow__arrowhead polyline,
+.react-flow .react-flow__arrowhead polygon {
+  fill: var(--color-fg-muted);
+  stroke: var(--color-fg-muted);
+}
+.react-flow .react-flow__arrowhead polyline.arrowclosed {
+  fill: var(--color-fg-muted);
+}
+
+/* ============================================================
+ * Adaptive Cards 시각 디자인 — HitlApprovalCard 와 톤 통일
+ * AC SDK 가 적용하는 클래스(ac-pushButton, ac-container) 에 후처리.
+ * ============================================================ */
+.adaptive-card-host .ac-adaptiveCard {
+  background-color: transparent;
+}
+.adaptive-card-host .ac-container {
+  border-radius: 12px;
+}
+.adaptive-card-host .ac-container.ac-container--accent,
+.adaptive-card-host .ac-container.ac-container--emphasis,
+.adaptive-card-host .ac-container.ac-container--good,
+.adaptive-card-host .ac-container.ac-container--warning,
+.adaptive-card-host .ac-container.ac-container--attention {
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+.adaptive-card-host .ac-actionSet {
+  margin-top: 12px;
+  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.adaptive-card-host .ac-pushButton {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.12);
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.adaptive-card-host .ac-pushButton:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+.adaptive-card-host .ac-pushButton.positive,
+.adaptive-card-host .ac-pushButton.style-positive {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+.adaptive-card-host .ac-pushButton.positive:hover,
+.adaptive-card-host .ac-pushButton.style-positive:hover {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+}
+.adaptive-card-host .ac-pushButton.destructive,
+.adaptive-card-host .ac-pushButton.style-destructive {
+  background: transparent;
+  border-color: rgba(220, 38, 38, 0.5);
+  color: #f87171;
+}
+.adaptive-card-host .ac-pushButton.destructive:hover,
+.adaptive-card-host .ac-pushButton.style-destructive:hover {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.7);
+}
+.adaptive-card-host .ac-input.ac-textInput,
+.adaptive-card-host .ac-input.ac-multichoiceInput,
+.adaptive-card-host .ac-input.ac-numberInput,
+.adaptive-card-host .ac-input.ac-dateInput,
+.adaptive-card-host .ac-input.ac-timeInput {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: #e5e7eb;
+}
+.adaptive-card-host .ac-input.ac-textInput:focus,
+.adaptive-card-host .ac-input.ac-numberInput:focus,
+.adaptive-card-host .ac-input.ac-dateInput:focus,
+.adaptive-card-host .ac-input.ac-timeInput:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.6);
+}
+.adaptive-card-host .ac-input.ac-textInput.ac-multiline {
+  min-height: 80px;
+  resize: vertical;
+}

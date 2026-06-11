@@ -1,0 +1,22 @@
+stages:
+  - deploy
+
+# dev 브랜치 push/merge 시에만 실행
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dev"
+
+# ────────────────────────────────────────
+# 개발서버 배포 (SSH)
+# ────────────────────────────────────────
+deploy:
+  stage: deploy
+  script:
+    - |
+      cd /home/workspace/agent002
+      git fetch origin dev
+      git reset --hard origin/dev
+    - bash /home/workspace/agent002/scripts/deploy-dev.sh
+  environment:
+    name: development
+    url: http://$DEV_SERVER_HOST:28002

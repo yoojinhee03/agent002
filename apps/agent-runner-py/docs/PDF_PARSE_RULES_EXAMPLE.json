@@ -1,0 +1,114 @@
+[
+  {
+    "docType": "주민등록등본",
+    "identifyKeywords": ["주민등록등본", "세대주", "세대원"],
+    "rules": [
+      {
+        "ruleCode": "MASKING_CHECK",
+        "ruleName": "주민번호 뒷자리 마스킹 여부",
+        "llmQuestion": "주민등록번호 뒷자리 7자리가 * 또는 ■ 기호로 마스킹 처리되어 있습니까? 본인 및 세대원 모두 확인하세요.",
+        "passCondition": "본인 및 모든 세대원의 주민번호 뒷자리가 *나 ■로 가려진 경우 PASS",
+        "failMessage": "주민번호 뒷자리가 마스킹 처리된 등본으로 재제출 요망",
+        "severity": "FAIL"
+      },
+      {
+        "ruleCode": "ISSUE_DATE_CHECK",
+        "ruleName": "발급일 기준 초과 여부",
+        "llmQuestion": "이 문서의 발급일을 YYYY-MM-DD 형식으로 추출하세요.",
+        "passCondition": "오늘({today})로부터 {threshold_days}일 이내 발급된 경우 PASS",
+        "failMessage": "최근 {threshold_days}일 이내 발급된 등본으로 재제출 요망",
+        "severity": "FAIL",
+        "thresholdDays": 90
+      }
+    ]
+  },
+  {
+    "docType": "주민등록초본",
+    "identifyKeywords": ["주민등록초본", "병역사항", "변동사항"],
+    "rules": [
+      {
+        "ruleCode": "MASKING_CHECK",
+        "ruleName": "주민번호 뒷자리 마스킹 여부",
+        "llmQuestion": "주민등록번호 뒷자리 7자리가 * 또는 ■ 기호로 마스킹 처리되어 있습니까?",
+        "passCondition": "주민번호 뒷자리가 *나 ■로 가려진 경우 PASS",
+        "failMessage": "주민번호 뒷자리가 마스킹 처리된 초본으로 재제출 요망",
+        "severity": "FAIL"
+      },
+      {
+        "ruleCode": "MILITARY_CHECK",
+        "ruleName": "병역 사항 포함 여부",
+        "llmQuestion": "이 문서에 병역 사항(병역 관계, 복무기간, 군별 등)이 기재되어 있습니까?",
+        "passCondition": "병역 사항 항목이 문서 내에 존재하는 경우 PASS (미필/필/면제 등 내용 무관)",
+        "failMessage": "병역 사항이 포함된 초본으로 재제출 요망",
+        "severity": "FAIL"
+      }
+    ]
+  },
+  {
+    "docType": "건강보험자격득실확인서",
+    "identifyKeywords": ["건강보험", "자격득실", "국민건강보험공단"],
+    "rules": [
+      {
+        "ruleCode": "CAREER_PERIOD_EXTRACT",
+        "ruleName": "재직기간 추출",
+        "llmQuestion": "직장 가입자 자격 취득일과 상실일을 모두 추출하세요. YYYY-MM-DD 형식으로 반환하고, 현재 재직 중이면 상실일을 null로 반환하세요.",
+        "passCondition": "자격 취득일과 상실일(또는 null)이 명확히 추출된 경우 PASS",
+        "failMessage": "재직기간을 확인할 수 없습니다. 건강보험자격득실확인서를 다시 제출 요망",
+        "severity": "FAIL"
+      },
+      {
+        "ruleCode": "CAREER_MATCH_CHECK",
+        "ruleName": "이력서 경력 일치 여부",
+        "llmQuestion": "추출된 재직기간이 이력서에 기재된 경력 사항과 일치합니까? 회사명과 재직기간을 대조하세요.",
+        "passCondition": "이력서 경력 기간과 자격득실 기간의 차이가 1개월 이내인 경우 PASS",
+        "failMessage": "건강보험 자격득실 기간과 이력서 경력 기간이 일치하지 않습니다. 확인 후 재제출 요망",
+        "severity": "WARNING"
+      }
+    ]
+  },
+  {
+    "docType": "통장사본",
+    "identifyKeywords": ["통장", "입출금", "예금주", "계좌번호"],
+    "rules": [
+      {
+        "ruleCode": "BANK_NAME_CHECK",
+        "ruleName": "하나은행 여부",
+        "llmQuestion": "이 문서에 기재된 은행명을 추출하세요.",
+        "passCondition": "하나은행 통장사본인 경우 PASS",
+        "failMessage": "하나은행 통장사본으로 재제출 요망",
+        "severity": "FAIL"
+      },
+      {
+        "ruleCode": "OWNER_MATCH_CHECK",
+        "ruleName": "예금주 본인 명의 여부",
+        "llmQuestion": "이 문서의 예금주명을 추출하세요.",
+        "passCondition": "예금주명이 지원자 이름과 일치하는 경우 PASS",
+        "failMessage": "본인 명의 통장사본으로 재제출 요망",
+        "severity": "FAIL"
+      }
+    ]
+  },
+  {
+    "docType": "최종학력증명서",
+    "identifyKeywords": ["졸업증명서", "학위증명서", "재학증명서", "수료증명서"],
+    "rules": [
+      {
+        "ruleCode": "ISSUE_DATE_CHECK",
+        "ruleName": "발급일 기준 초과 여부",
+        "llmQuestion": "이 문서의 발급일을 YYYY-MM-DD 형식으로 추출하세요.",
+        "passCondition": "오늘({today})로부터 {threshold_days}일 이내 발급된 경우 PASS",
+        "failMessage": "최근 {threshold_days}일 이내 발급된 학력증명서로 재제출 요망",
+        "severity": "FAIL",
+        "thresholdDays": 90
+      },
+      {
+        "ruleCode": "SCHOOL_MATCH_CHECK",
+        "ruleName": "이력서 학교명·전공 일치 여부",
+        "llmQuestion": "이 문서에 기재된 학교명과 전공(학과)명을 추출하세요.",
+        "passCondition": "이력서에 기재된 학교명·전공과 일치하는 경우 PASS",
+        "failMessage": "학력증명서의 학교명 또는 전공이 이력서와 일치하지 않습니다. 확인 후 재제출 요망",
+        "severity": "WARNING"
+      }
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+.turbo
+*.log
+.git
+.gitignore
+.env
+.env.local
+.env*.local
+docker-compose*.yml
+Dockerfile
+README.md
+docs/
+scripts/
+**/.DS_Store

@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-runner-py"
+version = "1.0.0"
+description = "AgentStudio 실행 엔진 — FastAPI + LangGraph Python"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-socketio[asyncio_client]>=5.11.0",
+    "aiohttp>=3.10.0",
+    # LangGraph / LangChain (deepagents 0.5.2 요구: langgraph 1.1.x, langchain 1.x)
+    "langgraph>=1.1.5,<1.2.0",
+    "langgraph-checkpoint-postgres>=2.0.0",
+    "langchain>=1.2.15",
+    "langchain-core>=1.2.27",
+    "langchain-openai>=1.0.0",
+    "langchain-anthropic>=1.4.0",
+    "langchain-google-genai>=4.2.1",
+    # deepagents 공식 패키지 (자체 deepagent-sdk 대체)
+    "deepagents>=0.5.2",
+    # MCP (Model Context Protocol) client SDK — McpClientService 가 stdio/sse 서버 연결에 사용
+    "mcp>=1.0.0",
+    # Database — 3.3.x has RecursionError on Python 3.13 (dict_row bug)
+    "psycopg[binary]>=3.2.0,<3.3",
+    "psycopg-pool>=3.2.0",
+    # Cache
+    "redis[hiredis]>=5.1.0",
+    # Background tasks
+    "arq>=0.26.0",
+    # Config & validation
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "python-dotenv>=1.0.0",
+    # HTTP & utils
+    "httpx>=0.27.0",
+    "structlog>=24.4.0",
+    # Schema validation
+    "jsonschema>=4.26.0",
+    # PDF processing
+    "pypdf>=5.0.0",
+    "pdf2image>=1.17.0",
+    "pymupdf>=1.24.0",
+    # Sandbox (per-thread Docker container for attachments + code exec)
+    "docker>=7.1.0",
+    # Multipart upload
+    "python-multipart>=0.0.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-httpx>=0.32.0",
+    "ruff>=0.7.0",
+    "mypy>=1.12.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

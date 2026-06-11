@@ -1,0 +1,14 @@
+export type EnvironmentTag = any;
+export type LLMTestRole = any;
+export type LLMTestMessage = any;
+export type LLMTestConfig = any;
+export type PromptSnapshot = any;
+export type VersionDiff = any;
+export type BlockDiffStatus = any;
+export type LineDiff = any;
+export type BlockDiffEntry = any;
+export type VariableDiffEntry = any;
+export type ModelDiffResult = any;
+export type StructuredOutputDiffResult = any;
+export type DetailedSnapshotDiff = any;
+export type Version = any;

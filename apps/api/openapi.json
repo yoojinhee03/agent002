@@ -1,0 +1,7198 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "description": "JWT 토큰 발급",
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "로그인 성공"
+          },
+          "401": {
+            "description": "이메일 또는 비밀번호 불일치"
+          }
+        },
+        "summary": "로그인",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "description": "Refresh 토큰 무효화",
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "로그아웃 성공"
+          },
+          "401": {
+            "description": "인증 필요"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "로그아웃",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "description": "Access 토큰 갱신",
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "토큰 갱신 성공"
+          },
+          "401": {
+            "description": "유효하지 않은 refresh 토큰"
+          }
+        },
+        "summary": "토큰 갱신",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "description": "비밀번호 재설정 이메일 발송",
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "이메일 발송 성공"
+          }
+        },
+        "summary": "비밀번호 재설정 요청",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "description": "토큰으로 비밀번호 재설정",
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "비밀번호 재설정 성공"
+          },
+          "401": {
+            "description": "유효하지 않은 재설정 요청"
+          }
+        },
+        "summary": "비밀번호 재설정",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all users (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current user retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current logged-in user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/search": {
+      "get": {
+        "operationId": "UsersController_search",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Search query (case insensitive, active users only)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Search users by name or email",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user by ID (admin only)",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user profile (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/invite": {
+      "post": {
+        "operationId": "UsersController_invite",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User invited successfully"
+          },
+          "409": {
+            "description": "User with this email already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a new user (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/register": {
+      "post": {
+        "operationId": "UsersController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "409": {
+            "description": "User with this email already exists"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register a new active user (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/activate": {
+      "patch": {
+        "operationId": "UsersController_activate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User activated successfully"
+          },
+          "400": {
+            "description": "User is not in pending status"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate a pending user (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/role": {
+      "patch": {
+        "operationId": "UsersController_updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated successfully"
+          },
+          "400": {
+            "description": "Cannot demote the last system admin"
+          },
+          "403": {
+            "description": "Cannot change your own role"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update system role for a user (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/password": {
+      "patch": {
+        "operationId": "UsersController_changePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change user password (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/resend-invite": {
+      "post": {
+        "operationId": "UsersController_resendInvite",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invite resent successfully"
+          },
+          "400": {
+            "description": "User is not in pending status"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resend invite for a pending user (admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "operationId": "ProjectsController_findAll",
+        "parameters": [
+          {
+            "name": "membersOnly",
+            "required": false,
+            "in": "query",
+            "description": "Filter to projects where current user is a member",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projects retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List projects",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "post": {
+        "operationId": "ProjectsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created successfully"
+          },
+          "409": {
+            "description": "Slug already in use"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new project",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/check-slug": {
+      "get": {
+        "operationId": "ProjectsController_checkSlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "query",
+            "description": "Slug to check",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "excludeId",
+            "required": false,
+            "in": "query",
+            "description": "Project ID to exclude",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slug availability checked"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check slug availability",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/by-slug/{slug}": {
+      "get": {
+        "operationId": "ProjectsController_findBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Project slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project retrieved successfully"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get project by slug (public)",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "operationId": "ProjectsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project retrieved successfully"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get project by ID",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "patch": {
+        "operationId": "ProjectsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated successfully"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a project",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "delete": {
+        "operationId": "ProjectsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project deleted successfully"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a project",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/{id}/duplicate": {
+      "post": {
+        "operationId": "ProjectsController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Project ID to duplicate",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DuplicateProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project duplicated successfully"
+          },
+          "404": {
+            "description": "Source project not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Duplicate a project",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/{id}/favorite": {
+      "post": {
+        "operationId": "ProjectsController_toggleFavorite",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite toggled"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle project favorite",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/activity-logs": {
+      "get": {
+        "operationId": "ProjectsController_getActivityLogs",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity logs retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get project activity logs",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/invitations/me": {
+      "get": {
+        "operationId": "MembersController_getMyInvitations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Invitations retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get my pending invitations across all projects",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/invite": {
+      "post": {
+        "operationId": "MembersController_inviteMember",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Member invited successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite a single member to project",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/invite-multiple": {
+      "post": {
+        "operationId": "MembersController_inviteMultiple",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteMultipleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Members invited successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invite multiple members to project",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}/accept": {
+      "patch": {
+        "operationId": "MembersController_acceptInvite",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation accepted"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accept project invitation",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}/decline": {
+      "patch": {
+        "operationId": "MembersController_declineInvite",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation declined"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Decline project invitation",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}/cancel": {
+      "patch": {
+        "operationId": "MembersController_cancelInvite",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation cancelled"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a pending invitation",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}/resend": {
+      "post": {
+        "operationId": "MembersController_resendInvite",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation resent"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resend project invitation",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/check-expired": {
+      "post": {
+        "operationId": "MembersController_checkExpired",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expired invitations checked"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check and update expired invitations",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}": {
+      "delete": {
+        "operationId": "MembersController_removeMember",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "removedBy",
+            "required": false,
+            "in": "query",
+            "description": "Name of person removing",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member removed successfully"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a member from project",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/members/{memberId}/role": {
+      "patch": {
+        "operationId": "MembersController_updateRole",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "Member ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member role updated"
+          },
+          "404": {
+            "description": "Member not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update member role",
+        "tags": [
+          "Project Members"
+        ]
+      }
+    },
+    "/api/providers": {
+      "get": {
+        "operationId": "ProvidersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/models/enabled": {
+      "get": {
+        "operationId": "ProvidersController_getEnabledModels",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/configure": {
+      "post": {
+        "operationId": "ProvidersController_configure",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigureProviderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/api-key": {
+      "delete": {
+        "operationId": "ProvidersController_removeApiKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/test": {
+      "post": {
+        "operationId": "ProvidersController_testConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{providerId}/models/{modelId}/toggle": {
+      "patch": {
+        "operationId": "ProvidersController_toggleModel",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "modelId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{providerId}/models": {
+      "post": {
+        "operationId": "ProvidersController_addCustomModel",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateModelDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{providerId}/models/{modelId}": {
+      "delete": {
+        "operationId": "ProvidersController_deleteCustomModel",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "modelId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/local": {
+      "post": {
+        "operationId": "ProvidersController_addLocalProvider",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLocalProviderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/local": {
+      "delete": {
+        "operationId": "ProvidersController_deleteLocalProvider",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/endpoint": {
+      "patch": {
+        "operationId": "ProvidersController_configureEndpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/providers/{id}/discover-models": {
+      "post": {
+        "operationId": "ProvidersController_discoverModels",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Providers"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/environments": {
+      "get": {
+        "operationId": "EnvironmentsController_findByProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Environments"
+        ]
+      },
+      "post": {
+        "operationId": "EnvironmentsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnvironmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Environments"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/environments/reorder": {
+      "patch": {
+        "operationId": "EnvironmentsController_reorder",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderEnvironmentsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update environment display order",
+        "tags": [
+          "Environments"
+        ]
+      }
+    },
+    "/api/environments/{id}": {
+      "patch": {
+        "operationId": "EnvironmentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnvironmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Environments"
+        ]
+      },
+      "delete": {
+        "operationId": "EnvironmentsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Environments"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/deployments": {
+      "get": {
+        "operationId": "DeploymentsController_findByProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deployments retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List deployments for a project",
+        "tags": [
+          "Deployments"
+        ]
+      },
+      "post": {
+        "operationId": "DeploymentsController_deploy",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeploymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Deployment created successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deploy a prompt version",
+        "tags": [
+          "Deployments"
+        ]
+      }
+    },
+    "/api/deployments/{deploymentId}": {
+      "delete": {
+        "operationId": "DeploymentsController_undeploy",
+        "parameters": [
+          {
+            "name": "deploymentId",
+            "required": true,
+            "in": "path",
+            "description": "Deployment ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deployment removed successfully"
+          },
+          "404": {
+            "description": "Deployment not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Undeploy a deployment",
+        "tags": [
+          "Deployments"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/deployments/logs": {
+      "get": {
+        "operationId": "DeploymentsController_getLogs",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deployment logs retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get deployment logs for a project",
+        "tags": [
+          "Deployments"
+        ]
+      }
+    },
+    "/api/endpoints": {
+      "get": {
+        "operationId": "EndpointsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All endpoints retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EndpointResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all endpoints (global)",
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/endpoints": {
+      "get": {
+        "operationId": "EndpointsController_findByProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Endpoints retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EndpointResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List endpoints for a project",
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/api-keys": {
+      "get": {
+        "operationId": "EndpointsController_getApiKeys",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API keys retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List API keys for a project",
+        "tags": [
+          "Endpoints"
+        ]
+      },
+      "post": {
+        "operationId": "EndpointsController_createApiKey",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApiKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "API key created successfully (raw key is returned once)"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an API key for a project",
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/api/api-keys/{id}/revoke": {
+      "patch": {
+        "operationId": "EndpointsController_revokeApiKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "API key ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key revoked successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke an API key",
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/api/api-keys/{id}/toggle": {
+      "patch": {
+        "operationId": "EndpointsController_toggleApiKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "API key ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key toggled successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle an API key enabled flag",
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "operationId": "DashboardController_getGlobalOverview",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": false,
+            "in": "query",
+            "description": "Optional project filter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard data retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get global dashboard overview",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/dashboard": {
+      "get": {
+        "operationId": "DashboardController_getOverview",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard data retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get project dashboard overview (legacy)",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/usage/global": {
+      "get": {
+        "operationId": "UsageController_getGlobalUsage",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usage"
+        ]
+      }
+    },
+    "/api/usage/projects/{projectId}": {
+      "get": {
+        "operationId": "UsageController_getProjectUsage",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usage"
+        ]
+      }
+    },
+    "/api/usage/logs": {
+      "get": {
+        "operationId": "UsageController_getExecutionLogs",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "workflowId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endpointId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apiKeyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Usage"
+        ]
+      }
+    },
+    "/api/monitoring/summary": {
+      "get": {
+        "operationId": "MonitoringController_getSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Monitoring"
+        ]
+      }
+    },
+    "/api/monitoring/daily": {
+      "get": {
+        "operationId": "MonitoringController_getDailyMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Monitoring"
+        ]
+      }
+    },
+    "/api/monitoring/logs": {
+      "get": {
+        "operationId": "MonitoringController_getLogs",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Monitoring"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/workflows": {
+      "get": {
+        "operationId": "WorkflowsController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      },
+      "post": {
+        "operationId": "WorkflowsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/api/workflows/{id}": {
+      "get": {
+        "operationId": "WorkflowsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      },
+      "patch": {
+        "operationId": "WorkflowsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      },
+      "delete": {
+        "operationId": "WorkflowsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/workflows/check-slug": {
+      "get": {
+        "operationId": "WorkflowsController_checkSlug",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "excludeId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/api/workflows/{workflowId}/versions": {
+      "get": {
+        "operationId": "WorkflowsController_listVersions",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      },
+      "post": {
+        "operationId": "WorkflowsController_createVersion",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVersionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/api/workflows/{workflowId}/versions/{versionId}/rollback": {
+      "post": {
+        "operationId": "WorkflowsController_rollback",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "versionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "workflows"
+        ]
+      }
+    },
+    "/api/tools/ai-generate": {
+      "post": {
+        "operationId": "ToolsController_aiGenerate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiGenerateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "AI를 이용한 도구 구성 요소 생성/수정",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tool-groups": {
+      "get": {
+        "operationId": "ToolsController_listGroups",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "프로젝트 Tool 그룹 목록",
+        "tags": [
+          "tools"
+        ]
+      },
+      "post": {
+        "operationId": "ToolsController_createGroup",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Tool 그룹 생성",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tool-groups/{id}": {
+      "patch": {
+        "operationId": "ToolsController_updateGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Tool 그룹 수정",
+        "tags": [
+          "tools"
+        ]
+      },
+      "delete": {
+        "operationId": "ToolsController_deleteGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Tool 그룹 삭제 (도구 cascade)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tool-groups/{groupId}/tools": {
+      "get": {
+        "operationId": "ToolsController_listGroupTools",
+        "parameters": [
+          {
+            "name": "groupId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "그룹 내 도구 목록",
+        "tags": [
+          "tools"
+        ]
+      },
+      "post": {
+        "operationId": "ToolsController_addToolToGroup",
+        "parameters": [
+          {
+            "name": "groupId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "그룹에 도구 추가",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tool-groups/{id}/analyze-openapi-url": {
+      "post": {
+        "operationId": "ToolsController_analyzeOpenApiByUrl",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "OpenAPI URL 분석 (미리보기)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tool-groups/{id}/analyze-openapi": {
+      "post": {
+        "operationId": "ToolsController_analyzeOpenApi",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "OpenAPI 스펙 분석 (미리보기)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tool-groups/{groupId}/batch-import": {
+      "post": {
+        "operationId": "ToolsController_batchImport",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "선택한 도구들 일괄 등록",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tool-groups/{id}/export-openapi": {
+      "get": {
+        "operationId": "ToolsController_exportOpenApi",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "그룹을 OpenAPI 스펙으로 내보내기",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools": {
+      "get": {
+        "operationId": "ToolsController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      },
+      "post": {
+        "operationId": "ToolsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/builtin": {
+      "get": {
+        "operationId": "ToolsController_getBuiltin",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Built-in 도구 카탈로그 + 활성화 상태 조회",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/builtin/{toolId}": {
+      "patch": {
+        "operationId": "ToolsController_toggleBuiltin",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "toolId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Built-in 도구 활성화 토글",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/builtin/gmail/auth-url": {
+      "get": {
+        "operationId": "ToolsController_getGmailAuthUrl",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gmail OAuth 인증 URL 생성 (Built-in gmail_search)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/builtin/gmail/app-config": {
+      "patch": {
+        "operationId": "ToolsController_saveGmailAppConfig",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gmail OAuth 앱 설정 저장 (clientId/clientSecret/redirectUri)",
+        "tags": [
+          "tools"
+        ]
+      },
+      "get": {
+        "operationId": "ToolsController_getGmailAppConfig",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gmail OAuth 앱 설정 조회 (Secret은 노출하지 않음)",
+        "tags": [
+          "tools"
+        ]
+      },
+      "delete": {
+        "operationId": "ToolsController_clearGmailAppConfig",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gmail OAuth 앱 설정/연동 정보 삭제 (초기화)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/builtin/gmail/callback": {
+      "post": {
+        "operationId": "ToolsController_gmailCallback",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Gmail OAuth 콜백 처리 (code 교환 후 refresh_token 저장)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/internal/agents/{agentId}/gmail/access-token": {
+      "get": {
+        "operationId": "ToolsController_issueGmailAccessToken",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Runner 내부용 Gmail access token 발급 (userId 가 있으면 user OAuth 우선)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/internal/vision/analyze": {
+      "post": {
+        "operationId": "ToolsController_internalVisionAnalyze",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InternalVisionAnalyzeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vision analyze result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "content": "{\"ok\":true}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Runner 내부용: Vision 기반 문서 이미지 분석",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/internal/agents/{agentId}/pdf-parse-rules": {
+      "get": {
+        "operationId": "ToolsController_getPdfParseRules",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Runner/Web 공용: PDF Parse 규칙 조회",
+        "tags": [
+          "tools"
+        ]
+      },
+      "put": {
+        "operationId": "ToolsController_putPdfParseRules",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Runner/Web 공용: PDF Parse 규칙 저장(전체 교체)",
+        "tags": [
+          "tools"
+        ]
+      },
+      "post": {
+        "operationId": "ToolsController_postPdfParseRules",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Runner/Web 공용: PDF Parse 규칙 저장(전체 교체)",
+        "tags": [
+          "tools"
+        ]
+      },
+      "delete": {
+        "operationId": "ToolsController_deletePdfParseRules",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Runner/Web 공용: PDF Parse 규칙 삭제",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tools/{id}": {
+      "get": {
+        "operationId": "ToolsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      },
+      "patch": {
+        "operationId": "ToolsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      },
+      "delete": {
+        "operationId": "ToolsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tools/{id}/toggle": {
+      "patch": {
+        "operationId": "ToolsController_toggle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/tools/{id}/test": {
+      "post": {
+        "operationId": "ToolsController_testById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "저장된 Tool 즉시 실행 테스트",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/tools/test": {
+      "post": {
+        "operationId": "ToolsController_testInline",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "저장 없이 Tool 인라인 테스트 (위자드 Step 5)",
+        "tags": [
+          "tools"
+        ]
+      }
+    },
+    "/api/workflows/{workflowId}/runs": {
+      "get": {
+        "operationId": "RunsController_listByWorkflow",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/runs/{runId}": {
+      "get": {
+        "operationId": "RunsController_getById",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/runs/{runId}/traces": {
+      "get": {
+        "operationId": "RunsController_getTraces",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/agents": {
+      "post": {
+        "operationId": "AgentsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 생성",
+        "tags": [
+          "Agents"
+        ]
+      },
+      "get": {
+        "operationId": "AgentsController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 목록 조회",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}": {
+      "get": {
+        "operationId": "AgentDetailController_get",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 상세 조회",
+        "tags": [
+          "Agents"
+        ]
+      },
+      "patch": {
+        "operationId": "AgentDetailController_update",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 수정",
+        "tags": [
+          "Agents"
+        ]
+      },
+      "delete": {
+        "operationId": "AgentDetailController_delete",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 삭제",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/prompt-versions": {
+      "get": {
+        "operationId": "AgentDetailController_listPromptVersions",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "프롬프트 버전 목록",
+        "tags": [
+          "Agents"
+        ]
+      },
+      "post": {
+        "operationId": "AgentDetailController_createPromptVersion",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "프롬프트 버전 저장",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/clone": {
+      "post": {
+        "operationId": "AgentDetailController_clone",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "복제된 에이전트"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 복제",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/export": {
+      "get": {
+        "operationId": "AgentDetailController_exportAgent",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "에이전트 설정 JSON"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 설정 내보내기 (JSON)",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/schedules": {
+      "get": {
+        "operationId": "AgentDetailController_listSchedules",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스케줄 목록 조회",
+        "tags": [
+          "Agents"
+        ]
+      },
+      "post": {
+        "operationId": "AgentDetailController_createSchedule",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스케줄 추가",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/schedules/{scheduleId}": {
+      "delete": {
+        "operationId": "AgentDetailController_deleteSchedule",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스케줄 삭제",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/schedules/{scheduleId}/run": {
+      "post": {
+        "operationId": "AgentDetailController_runSchedule",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스케줄 즉시 실행",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/import": {
+      "post": {
+        "operationId": "AgentImportController_importAgent",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "가져온 에이전트"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "JSON으로 에이전트 가져오기",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/agents/compare": {
+      "post": {
+        "operationId": "AgentImportController_compare",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "두 에이전트 A/B 비교 실행",
+        "tags": [
+          "Agents"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/teams": {
+      "post": {
+        "operationId": "TeamsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 팀 생성",
+        "tags": [
+          "Teams"
+        ]
+      },
+      "get": {
+        "operationId": "TeamsController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 팀 목록 조회",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}": {
+      "get": {
+        "operationId": "TeamDetailController_get",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀 상세 조회",
+        "tags": [
+          "Teams"
+        ]
+      },
+      "patch": {
+        "operationId": "TeamDetailController_update",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀 수정",
+        "tags": [
+          "Teams"
+        ]
+      },
+      "delete": {
+        "operationId": "TeamDetailController_delete",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀 삭제",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}/agents": {
+      "post": {
+        "operationId": "TeamDetailController_addAgent",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀에 에이전트 추가",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}/agents/{agentId}": {
+      "delete": {
+        "operationId": "TeamDetailController_removeAgent",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀에서 에이전트 제거",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}/subteams": {
+      "post": {
+        "operationId": "TeamDetailController_addSubTeam",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀에 서브팀 추가 (Nested Team)",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}/subteams/{subTeamId}": {
+      "delete": {
+        "operationId": "TeamDetailController_removeSubTeam",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subTeamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀에서 서브팀 제거",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/teams/{teamId}/invoke": {
+      "post": {
+        "operationId": "TeamDetailController_invoke",
+        "parameters": [
+          {
+            "name": "teamId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "팀 실행 (Playground 용 stub)",
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/threads": {
+      "post": {
+        "operationId": "ThreadsController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project UUID 또는 slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "agentId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "teamId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "title": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "deep-agent 대화"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Thread 생성됨"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "새 대화 스레드 시작",
+        "tags": [
+          "Threads"
+        ]
+      },
+      "get": {
+        "operationId": "ThreadsController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project UUID 또는 slug",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "미지정 시 전체. Client 사이드바는 항상 active.",
+            "schema": {
+              "enum": [
+                "active",
+                "paused",
+                "completed",
+                "failed",
+                "archived"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(Thread & { agent?, team?, _count })[]"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스레드 목록 조회",
+        "tags": [
+          "Threads"
+        ]
+      }
+    },
+    "/api/threads/{threadId}": {
+      "get": {
+        "operationId": "ThreadDetailController_get",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread + interactions + agent/team"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스레드 상세 조회 (메시지 포함)",
+        "tags": [
+          "Threads"
+        ]
+      },
+      "patch": {
+        "description": "Client UI 의 ClientChatView 가 첫 사용자 메시지 첫 40자로 호출.",
+        "operationId": "ThreadDetailController_update",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "example": "최신 메일 알려줘"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "업데이트된 Thread"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스레드 메타 업데이트(title)",
+        "tags": [
+          "Threads"
+        ]
+      },
+      "delete": {
+        "description": "status 를 archived 로 전환. status=active 필터에서 제외됨.",
+        "operationId": "ThreadDetailController_archive",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스레드 아카이브 (soft-delete)",
+        "tags": [
+          "Threads"
+        ]
+      }
+    },
+    "/api/threads/{threadId}/invoke": {
+      "post": {
+        "operationId": "ThreadDetailController_invoke",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "최신 메일 알려줘"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "runner raw 응답 — 보통 { messages: ThreadMessage[] }"
+          },
+          "502": {
+            "description": "Runner 호출 실패"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "에이전트 메시지 전송 (runner 프록시)",
+        "tags": [
+          "Threads"
+        ]
+      }
+    },
+    "/api/threads/{threadId}/resume": {
+      "post": {
+        "operationId": "ThreadDetailController_resume",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "approved"
+                ],
+                "properties": {
+                  "approved": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "HITL 승인/거절 (runner 프록시)",
+        "tags": [
+          "Threads"
+        ]
+      }
+    },
+    "/api/threads/{threadId}/messages": {
+      "get": {
+        "operationId": "ThreadDetailController_getMessages",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ThreadMessage[] — { role, content, toolCalls?, timestamp, metadata? }[]"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "스레드 메시지 목록 (runner 프록시)",
+        "tags": [
+          "Threads"
+        ]
+      }
+    },
+    "/api/api/projects/{projectId}/interactions": {
+      "get": {
+        "operationId": "HitlController_listPending",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "대기 중인 HITL 상호작용 목록",
+        "tags": [
+          "HITL"
+        ]
+      }
+    },
+    "/api/api/interactions/{id}": {
+      "get": {
+        "operationId": "HitlController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "HITL 상호작용 상세 조회",
+        "tags": [
+          "HITL"
+        ]
+      }
+    },
+    "/api/api/interactions/{id}/respond": {
+      "post": {
+        "operationId": "HitlController_respond",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "HITL 상호작용에 응답",
+        "tags": [
+          "HITL"
+        ]
+      }
+    },
+    "/api/api/interactions/{id}/escalate": {
+      "post": {
+        "operationId": "HitlController_escalate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "HITL 상호작용 에스컬레이션",
+        "tags": [
+          "HITL"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/mcp": {
+      "get": {
+        "operationId": "McpController_list",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "MCP Server 목록 조회",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "post": {
+        "operationId": "McpController_create",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMcpServerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "MCP Server 등록",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/{id}": {
+      "get": {
+        "operationId": "McpController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "MCP Server 상세",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "put": {
+        "operationId": "McpController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "MCP Server 설정 수정",
+        "tags": [
+          "mcp"
+        ]
+      },
+      "delete": {
+        "operationId": "McpController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "MCP Server 삭제",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/{id}/connect": {
+      "post": {
+        "operationId": "McpController_connect",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "연결 테스트 + tool 목록 갱신",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/{id}/disconnect": {
+      "post": {
+        "operationId": "McpController_disconnect",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "연결 해제",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/mcp/{id}/tools": {
+      "get": {
+        "operationId": "McpController_getTools",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "캐시된 tool 목록",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/projects/{projectId}/mcp/tools": {
+      "get": {
+        "operationId": "McpController_listAllTools",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "프로젝트 전체 MCP tool 집계 (Agent Builder용)",
+        "tags": [
+          "mcp"
+        ]
+      }
+    },
+    "/api/skills": {
+      "get": {
+        "operationId": "SkillsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Skills 목록 반환"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "현재 사용자 Skills 목록 조회 (files 포함)",
+        "tags": [
+          "Skills"
+        ]
+      },
+      "post": {
+        "operationId": "SkillsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성된 Skill 반환"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 생성",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/api/skills/{id}": {
+      "get": {
+        "operationId": "SkillsController_getOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skill 반환"
+          },
+          "404": {
+            "description": "Skill 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 단건 조회 (files 포함)",
+        "tags": [
+          "Skills"
+        ]
+      },
+      "patch": {
+        "operationId": "SkillsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정된 Skill 반환"
+          },
+          "404": {
+            "description": "Skill 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 수정",
+        "tags": [
+          "Skills"
+        ]
+      },
+      "delete": {
+        "operationId": "SkillsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "삭제 성공"
+          },
+          "404": {
+            "description": "Skill 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 삭제",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/api/skills/{id}/files": {
+      "post": {
+        "operationId": "SkillsController_addFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성된 SkillFile 반환"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill에 파일 추가",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/api/skills/{id}/files/{fileId}": {
+      "patch": {
+        "operationId": "SkillsController_updateFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSkillFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정된 SkillFile 반환"
+          },
+          "404": {
+            "description": "파일 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 파일 수정",
+        "tags": [
+          "Skills"
+        ]
+      },
+      "delete": {
+        "operationId": "SkillsController_removeFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "삭제 성공"
+          },
+          "404": {
+            "description": "파일 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Skill 파일 삭제",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/api/daily-metrics/aggregate": {
+      "post": {
+        "operationId": "DailyMetricsController_manualAggregate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "집계된 행 수 반환"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "특정 날짜의 daily_metrics 수동 재집계 (cron 백필/재실행용)",
+        "tags": [
+          "DailyMetrics"
+        ]
+      }
+    },
+    "/api/agents/{agentId}/deployments": {
+      "post": {
+        "operationId": "AgentDeploymentsController_deploy",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentDeploymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성된 AgentDeployment 반환"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Agent 배포 (snapshot 캡처 + version 자동 + publicPath 생성)",
+        "tags": [
+          "AgentDeployments"
+        ]
+      },
+      "get": {
+        "operationId": "AgentDeploymentsController_listByAgent",
+        "parameters": [
+          {
+            "name": "agentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Agent 의 배포 이력 조회",
+        "tags": [
+          "AgentDeployments"
+        ]
+      }
+    },
+    "/api/agent-deployments/{id}": {
+      "get": {
+        "operationId": "AgentDeploymentsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AgentDeployment 단건 조회",
+        "tags": [
+          "AgentDeployments"
+        ]
+      }
+    },
+    "/api/agent-deployments/{id}/undeploy": {
+      "post": {
+        "operationId": "AgentDeploymentsController_undeploy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AgentDeployment 비활성화 (status=inactive)",
+        "tags": [
+          "AgentDeployments"
+        ]
+      }
+    },
+    "/api/agent-deployments/{id}/api-keys": {
+      "post": {
+        "description": "응답의 rawKey 는 다시 조회할 수 없으므로 즉시 사용자에게 전달해야 함.",
+        "operationId": "AgentDeploymentsController_issueApiKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueDeploymentApiKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "발급된 API Key (rawKey 포함)"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AgentDeployment API Key 발급 (raw key 1회 응답)",
+        "tags": [
+          "AgentDeployments"
+        ]
+      },
+      "get": {
+        "operationId": "AgentDeploymentsController_listApiKeys",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "AgentDeployment API Key 목록 (마스킹된 값만)",
+        "tags": [
+          "AgentDeployments"
+        ]
+      }
+    },
+    "/api/api-keys/{keyId}": {
+      "delete": {
+        "operationId": "AgentDeploymentsController_revokeApiKey",
+        "parameters": [
+          {
+            "name": "keyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "API Key revoke (status=revoked, enabled=false)",
+        "tags": [
+          "AgentDeployments"
+        ]
+      }
+    },
+    "/api/v1/chat/threads": {
+      "post": {
+        "operationId": "PublicChatController_createThread",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePublicThreadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성된 thread {id, status, title, createdAt}"
+          }
+        },
+        "security": [
+          {
+            "X-API-Key": []
+          }
+        ],
+        "summary": "외부 client thread 생성 (X-API-Key 의 deployment 기준)",
+        "tags": [
+          "PublicChat"
+        ]
+      }
+    },
+    "/api/v1/chat/threads/{threadId}/messages": {
+      "post": {
+        "operationId": "PublicChatController_invoke",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvokeMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "X-API-Key": []
+          }
+        ],
+        "summary": "메시지 전송 + 즉시 응답 (runner 프록시)",
+        "tags": [
+          "PublicChat"
+        ]
+      },
+      "get": {
+        "operationId": "PublicChatController_getMessages",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "X-API-Key": []
+          }
+        ],
+        "summary": "thread 메시지 이력 조회 (runner 프록시)",
+        "tags": [
+          "PublicChat"
+        ]
+      }
+    },
+    "/api/v1/chat/threads/{threadId}/resume": {
+      "post": {
+        "operationId": "PublicChatController_resume",
+        "parameters": [
+          {
+            "name": "threadId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "X-API-Key": []
+          }
+        ],
+        "summary": "HITL 응답 (decisions: deepagents 포맷)",
+        "tags": [
+          "PublicChat"
+        ]
+      }
+    },
+    "/api/client/agents": {
+      "get": {
+        "operationId": "ClientAgentsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "ClientAgentCard[]"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "현재 사용자가 사용 가능한 활성 AgentDeployment 카드 목록",
+        "tags": [
+          "ClientAgents"
+        ]
+      }
+    },
+    "/api/client/agents/{slug}": {
+      "get": {
+        "operationId": "ClientAgentsController_get",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ClientAgentDetail (requiredCredentials/missingCredentials 포함)"
+          },
+          "404": {
+            "description": "활성 배포 없음"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "agent slug 로 상세 조회 + 누락 자격증명 도출",
+        "tags": [
+          "ClientAgents"
+        ]
+      }
+    },
+    "/api/me/credentials": {
+      "get": {
+        "operationId": "MeCredentialsController_list",
+        "parameters": [
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "provider",
+                "tool",
+                "mcp"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "본인 자격증명 마스킹 목록",
+        "tags": [
+          "MeCredentials"
+        ]
+      },
+      "post": {
+        "operationId": "MeCredentialsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCredentialDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "마스킹된 자격증명 객체"
+          },
+          "409": {
+            "description": "동일 (kind+targetId+label) 중복"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "자격증명 등록 — value 는 1회만 평문 전달, 이후 조회 불가",
+        "tags": [
+          "MeCredentials"
+        ]
+      }
+    },
+    "/api/me/credentials/{id}": {
+      "patch": {
+        "operationId": "MeCredentialsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCredentialDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "자격증명 라벨/값/metadata 변경",
+        "tags": [
+          "MeCredentials"
+        ]
+      },
+      "delete": {
+        "operationId": "MeCredentialsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "자격증명 삭제",
+        "tags": [
+          "MeCredentials"
+        ]
+      }
+    },
+    "/api/me/credentials/{id}/test": {
+      "post": {
+        "operationId": "MeCredentialsController_test",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "자격증명 실 검증 — provider:openai/anthropic 은 ping, 그 외는 형식 sanity",
+        "tags": [
+          "MeCredentials"
+        ]
+      }
+    },
+    "/api/me/credentials/gmail/oauth-app": {
+      "get": {
+        "operationId": "GmailOAuthController_getApp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "본인 Gmail OAuth 앱 설정 조회",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      },
+      "put": {
+        "operationId": "GmailOAuthController_saveApp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "clientId",
+                  "redirectUri"
+                ],
+                "properties": {
+                  "clientId": {
+                    "type": "string",
+                    "example": "xxx.apps.googleusercontent.com"
+                  },
+                  "clientSecret": {
+                    "type": "string",
+                    "example": "GOCSPX-...",
+                    "description": "저장된 값 유지하려면 생략"
+                  },
+                  "redirectUri": {
+                    "type": "string",
+                    "example": "http://localhost:3001/client/oauth/google/callback"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "https://www.googleapis.com/auth/gmail.readonly"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ success: true }"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gmail OAuth 앱 설정 저장 (clientId/secret/redirectUri/scopes)",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      },
+      "delete": {
+        "operationId": "GmailOAuthController_clearApp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gmail OAuth 앱 설정 + refresh_token 모두 삭제",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      }
+    },
+    "/api/me/credentials/gmail/auth-url": {
+      "get": {
+        "operationId": "GmailOAuthController_authUrl",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Google OAuth 동의 URL 발급 (state 에 userId 인코딩)",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      }
+    },
+    "/api/me/credentials/gmail/callback": {
+      "post": {
+        "operationId": "GmailOAuthController_callback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "state"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "4/0Adeu5BW...",
+                    "description": "Google authorization code"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "auth-url 발급 시 받은 state"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ connected: true }"
+          },
+          "400": {
+            "description": "oauth_state_mismatch"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "OAuth callback — code + state → refresh_token 저장",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      }
+    },
+    "/api/me/credentials/gmail/disconnect": {
+      "post": {
+        "operationId": "GmailOAuthController_disconnect",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "연동 해제 — refresh_token 만 제거 (앱 설정은 유지)",
+        "tags": [
+          "MeCredentials.Gmail"
+        ]
+      }
+    },
+    "/api/me/providers": {
+      "get": {
+        "operationId": "MeProvidersController_catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Provider[] (owned, userCredentials 포함)"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "시스템 Provider 카탈로그 + 본인 보유 여부",
+        "tags": [
+          "MeProviders"
+        ]
+      },
+      "post": {
+        "operationId": "MeProvidersController_add",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddProviderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "생성된 자격증명 + provider 메타"
+          },
+          "409": {
+            "description": "동일 provider+label 중복"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "본인 Provider 자격증명 등록 (UserCredential(kind=provider) 생성)",
+        "tags": [
+          "MeProviders"
+        ]
+      }
+    },
+    "/api/me/tools": {
+      "get": {
+        "operationId": "MeToolsController_catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "ToolCredentialCatalog[]"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "도구 자격증명 카탈로그 + 본인 보유 여부",
+        "tags": [
+          "MeTools"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "AgentStudio API",
+    "description": "AgentStudio 관리 API. Client UI(`apps/agent-web`) 페이지별 사용 매핑은 `API.md` §10 참조.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "로그인/토큰 갱신"
+    },
+    {
+      "name": "Users",
+      "description": "사용자"
+    },
+    {
+      "name": "Projects",
+      "description": "프로젝트"
+    },
+    {
+      "name": "ClientAgents",
+      "description": "Client UI: 배포된 에이전트 디스커버리"
+    },
+    {
+      "name": "Threads",
+      "description": "Client UI: 채팅 thread CRUD + invoke/resume/messages"
+    },
+    {
+      "name": "MeCredentials",
+      "description": "Client UI: 사용자 자격증명 (provider/tool/mcp)"
+    },
+    {
+      "name": "MeCredentials.Gmail",
+      "description": "Client UI: Gmail OAuth 앱 + refresh_token"
+    },
+    {
+      "name": "MeProviders",
+      "description": "Client UI: Provider 카탈로그 + 등록"
+    },
+    {
+      "name": "MeTools",
+      "description": "Client UI: 도구 자격증명 카탈로그"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:4200",
+      "description": "local dev"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "POST /api/auth/login 으로 발급받은 accessToken"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "사용자 이메일"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "비밀번호 (최소 6자)"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbG...",
+            "description": "Refresh 토큰"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "비밀번호 재설정 대상 이메일"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "사용자 이메일"
+          },
+          "token": {
+            "type": "string",
+            "example": "reset-token",
+            "description": "비밀번호 재설정 토큰"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newPassword123",
+            "description": "새 비밀번호 (최소 6자)"
+          }
+        },
+        "required": [
+          "email",
+          "token",
+          "newPassword"
+        ]
+      },
+      "InviteUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ]
+      },
+      "RegisterUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "UpdateUserRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "user"
+            ]
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "example": "https://example.com/avatar.png"
+          }
+        }
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "example": "newPassword123",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "newPassword"
+        ]
+      },
+      "CreateProjectMemberDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "joinedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "invitedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "invitedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "CreateProjectDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "New Project"
+          },
+          "description": {
+            "type": "string",
+            "example": "Project description"
+          },
+          "slug": {
+            "type": "string",
+            "example": "new-project"
+          },
+          "visibility": {
+            "type": "string",
+            "example": "private",
+            "enum": [
+              "private",
+              "public"
+            ]
+          },
+          "publicDocsEnabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateProjectMemberDto"
+            }
+          },
+          "allowAllModels": {
+            "type": "boolean",
+            "example": true
+          },
+          "allowedModelIds": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultModelId": {
+            "type": "string",
+            "example": "gpt-4o"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ]
+      },
+      "UpdateProjectDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "New Project"
+          },
+          "description": {
+            "type": "string",
+            "example": "Project description"
+          },
+          "slug": {
+            "type": "string",
+            "example": "new-project"
+          },
+          "visibility": {
+            "type": "string",
+            "example": "private",
+            "enum": [
+              "private",
+              "public"
+            ]
+          },
+          "publicDocsEnabled": {
+            "type": "boolean",
+            "example": false
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateProjectMemberDto"
+            }
+          },
+          "allowAllModels": {
+            "type": "boolean",
+            "example": true
+          },
+          "allowedModelIds": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultModelId": {
+            "type": "string",
+            "example": "gpt-4o"
+          }
+        }
+      },
+      "CreatorMemberDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "admin",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "ModelSettingsDto": {
+        "type": "object",
+        "properties": {
+          "allowAllModels": {
+            "type": "boolean",
+            "example": true
+          },
+          "allowedModelIds": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultModelId": {
+            "type": "string",
+            "example": "gpt-4o"
+          }
+        }
+      },
+      "DuplicateProjectDto": {
+        "type": "object",
+        "properties": {
+          "creatorMember": {
+            "$ref": "#/components/schemas/CreatorMemberDto"
+          },
+          "selectedPromptIds": {
+            "example": [
+              "prompt-1",
+              "prompt-2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "copyVersions": {
+            "type": "boolean",
+            "example": true
+          },
+          "visibility": {
+            "type": "string",
+            "example": "private",
+            "enum": [
+              "private",
+              "public"
+            ]
+          },
+          "modelSettings": {
+            "$ref": "#/components/schemas/ModelSettingsDto"
+          }
+        },
+        "required": [
+          "creatorMember",
+          "selectedPromptIds",
+          "copyVersions"
+        ]
+      },
+      "InviteMemberDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "New Member"
+          },
+          "email": {
+            "type": "string",
+            "example": "new@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "editor",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Welcome to the project!"
+          },
+          "invitedBy": {
+            "type": "string",
+            "example": "Hong Gildong"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role",
+          "invitedBy"
+        ]
+      },
+      "InviteUserItem": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "User Name"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ]
+      },
+      "InviteMultipleDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteUserItem"
+            }
+          },
+          "role": {
+            "type": "string",
+            "example": "editor",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ]
+          },
+          "invitedBy": {
+            "type": "string",
+            "example": "Hong Gildong"
+          },
+          "message": {
+            "type": "string",
+            "example": "Welcome to the project!"
+          }
+        },
+        "required": [
+          "users",
+          "role",
+          "invitedBy"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "example": "editor",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ]
+          },
+          "changedBy": {
+            "type": "string",
+            "example": "Hong Gildong"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "ConfigureProviderDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateModelDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateLocalProviderDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateEnvironmentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ReorderEnvironmentsDto": {
+        "type": "object",
+        "properties": {
+          "environmentIds": {
+            "description": "Array of environment IDs in the desired order",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "environmentIds"
+        ]
+      },
+      "UpdateEnvironmentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateDeploymentDto": {
+        "type": "object",
+        "properties": {
+          "workflowId": {
+            "type": "string",
+            "example": "workflow-id-123"
+          },
+          "workflowName": {
+            "type": "string",
+            "example": "My Workflow"
+          },
+          "environmentId": {
+            "type": "string",
+            "example": "env-id-456"
+          },
+          "environment": {
+            "type": "string",
+            "example": "production"
+          },
+          "versionId": {
+            "type": "string",
+            "example": "version-id-789"
+          },
+          "versionNumber": {
+            "type": "number",
+            "example": 3
+          },
+          "snapshot": {
+            "type": "object",
+            "description": "Version snapshot data"
+          },
+          "deployedBy": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "workflowId",
+          "workflowName",
+          "environmentId",
+          "environment",
+          "versionId",
+          "versionNumber",
+          "deployedBy"
+        ]
+      },
+      "EndpointPromptDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Customer Support"
+          },
+          "slug": {
+            "type": "string",
+            "example": "customer-support"
+          },
+          "description": {
+            "type": "string",
+            "description": "프롬프트 설명",
+            "example": "Customer support prompt for handling inquiries"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "description"
+        ]
+      },
+      "EndpointResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid"
+          },
+          "promptSlug": {
+            "type": "string",
+            "example": "customer-support"
+          },
+          "promptName": {
+            "type": "string",
+            "example": "Customer Support"
+          },
+          "description": {
+            "type": "string",
+            "description": "프롬프트 설명",
+            "example": "Customer support prompt for handling inquiries"
+          },
+          "path": {
+            "type": "string",
+            "example": "/api/v1/prompts/customer-support/production/run"
+          },
+          "method": {
+            "type": "string",
+            "example": "POST"
+          },
+          "environment": {
+            "type": "string",
+            "example": "production"
+          },
+          "versionNumber": {
+            "type": "number",
+            "example": 3
+          },
+          "modelId": {
+            "type": "string",
+            "example": "gpt-4o"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/EndpointPromptDto"
+          }
+        },
+        "required": [
+          "id",
+          "promptSlug",
+          "promptName",
+          "description",
+          "path",
+          "method",
+          "environment",
+          "versionNumber",
+          "modelId",
+          "status",
+          "prompt"
+        ]
+      },
+      "CreateApiKeyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Production API Key"
+          },
+          "environment": {
+            "type": "string",
+            "example": "production"
+          },
+          "endpointIds": {
+            "example": [
+              "endpoint-id-1"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scopes": {
+            "example": [
+              "read",
+              "execute"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validFrom": {
+            "type": "string",
+            "example": "2025-01-01T00:00:00Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "example": "2025-12-31T23:59:59Z"
+          }
+        },
+        "required": [
+          "name",
+          "environment"
+        ]
+      },
+      "CreateWorkflowDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateWorkflowDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateVersionDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AiGenerateDto": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "생성할 대상 (description, inputSchema, outputSchema, bodyTemplate)"
+          },
+          "name": {
+            "type": "string",
+            "description": "도구 이름"
+          },
+          "type": {
+            "type": "string",
+            "description": "도구 타입"
+          },
+          "description": {
+            "type": "string",
+            "description": "현재 설명"
+          },
+          "inputSchema": {
+            "type": "object",
+            "description": "현재 입력 스키마"
+          },
+          "outputSchema": {
+            "type": "object",
+            "description": "현재 출력 스키마"
+          },
+          "bodyTemplate": {
+            "type": "string",
+            "description": "현재 바디 템플릿"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "추가 힌트/요구사항"
+          }
+        },
+        "required": [
+          "target",
+          "name",
+          "type",
+          "description",
+          "inputSchema",
+          "outputSchema",
+          "bodyTemplate",
+          "prompt"
+        ]
+      },
+      "CreateToolDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "InternalVisionAnalyzeDto": {
+        "type": "object",
+        "properties": {
+          "image_base64": {
+            "type": "string",
+            "description": "Base64 encoded image (standard base64, no data: prefix)"
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "Image mime type",
+            "example": "image/jpeg"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Extraction prompt"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model id override (optional)"
+          }
+        },
+        "required": [
+          "image_base64",
+          "mime_type",
+          "prompt"
+        ]
+      },
+      "TestToolDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateMcpServerDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateSkillDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Skill 이름",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "Skill 설명",
+            "maxLength": 1024
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Skill 실행 지침"
+          },
+          "allowedTools": {
+            "description": "허용된 도구 목록",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "default": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateSkillDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Skill 이름",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "Skill 설명",
+            "maxLength": 1024
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Skill 실행 지침"
+          },
+          "allowedTools": {
+            "description": "허용된 도구 목록",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "활성화 여부",
+            "default": true
+          }
+        }
+      },
+      "CreateSkillFileDto": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "파일 경로 (예: src/utils/helper.py)",
+            "maxLength": 500
+          },
+          "content": {
+            "type": "string",
+            "description": "파일 내용"
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      },
+      "UpdateSkillFileDto": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "파일 경로 (예: src/utils/helper.py)",
+            "maxLength": 500
+          },
+          "content": {
+            "type": "string",
+            "description": "파일 내용"
+          }
+        }
+      },
+      "CreateAgentDeploymentDto": {
+        "type": "object",
+        "properties": {
+          "environmentId": {
+            "type": "string",
+            "description": "배포 대상 환경 ID",
+            "example": "env-uuid"
+          },
+          "description": {
+            "type": "string",
+            "description": "release note",
+            "example": "v1 first deploy"
+          }
+        },
+        "required": [
+          "environmentId"
+        ]
+      },
+      "IssueDeploymentApiKeyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Production widget key"
+          },
+          "scopes": {
+            "description": "scope 배열. 기본값 [\"chat:invoke\",\"chat:resume\",\"chat:read\"]",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "ISO datetime",
+            "example": "2026-05-08T00:00:00Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "ISO datetime",
+            "example": "2026-12-31T23:59:59Z"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CreatePublicThreadDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "문의: 가격 정책"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "외부 client 가 thread 에 부착할 자유로운 JSON metadata",
+            "example": {
+              "userRef": "u_42"
+            }
+          }
+        }
+      },
+      "InvokeMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "사용자 메시지",
+            "example": "제품 환불 정책이 어떻게 되나요?"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ResumeMessageDto": {
+        "type": "object",
+        "properties": {
+          "decisions": {
+            "type": "array",
+            "description": "deepagents HITL 응답 배열. [{type:\"approve\"} | {type:\"reject\"} | {type:\"edit\", edited_action:{...}}]",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "decisions"
+        ]
+      },
+      "CreateCredentialDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "provider",
+              "tool",
+              "mcp"
+            ]
+          },
+          "targetId": {
+            "type": "string",
+            "description": "provider slug / tool slug / mcp id",
+            "example": "openai"
+          },
+          "label": {
+            "type": "string",
+            "description": "같은 (kind, targetId) 에 여러 자격증명 등록 시 구분 라벨"
+          },
+          "value": {
+            "type": "string",
+            "description": "평문 자격증명. 응답 후에는 다시 조회 불가."
+          },
+          "metadata": {
+            "type": "object",
+            "description": "scope/account 등 부가 정보"
+          }
+        },
+        "required": [
+          "kind",
+          "targetId",
+          "value"
+        ]
+      },
+      "UpdateCredentialDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "description": "값을 교체하면 새로 암호화되어 저장됩니다."
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "AddProviderDto": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "type": "string",
+            "description": "Provider id (carrier 카탈로그 row)",
+            "example": "prov-uuid"
+          },
+          "value": {
+            "type": "string",
+            "description": "API key 평문"
+          },
+          "label": {
+            "type": "string",
+            "description": "같은 provider 에 여러 키 등록 시 라벨"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "organization id 등 부가 정보"
+          }
+        },
+        "required": [
+          "providerId",
+          "value"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+
+# Phase 8 spike output dumps
+spikes/output/
+
+# Runtime: thread sandbox attachments (사용자 업로드 파일 저장소)
+data/
+
+git rm --cached apps/agent-runner-py/.env
+
+.env
+**/.env

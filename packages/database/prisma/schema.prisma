@@ -1,0 +1,1349 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Enums
+// ============================================================
+
+enum UserStatus {
+  active
+  pending
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum MemberRole {
+  admin
+  editor
+  viewer
+}
+
+enum MemberStatus {
+  active
+  invited
+  declined
+  expired
+  cancelled
+}
+
+enum ProjectVisibility {
+  private
+  public
+}
+
+enum DeploymentStatus {
+  active
+  inactive
+  deploying
+  failed
+  pending_approval
+}
+
+enum TrafficPolicy {
+  immediate
+  canary
+}
+
+enum EndpointStatus {
+  active
+  paused
+  inactive
+}
+
+enum ApiKeyStatus {
+  active
+  revoked
+  expired
+}
+
+enum LogStatus {
+  success
+  error
+}
+
+enum DeploymentAction {
+  deploy
+  promote
+  rollback
+  pause
+  resume
+  undeploy
+}
+
+enum ActivityAction {
+  invited
+  accepted
+  declined
+  expired
+  cancelled
+  resent
+  removed
+  role_changed
+}
+
+enum ProviderType {
+  cloud
+  local
+}
+
+enum WorkflowStatus {
+  draft
+  published
+}
+
+enum NodeType {
+  llm
+  tool
+  condition
+  loop
+  transform
+  human_input
+  start
+  end
+  agent
+}
+
+// --- Step 0: Knowledge & Evaluation Enums ---
+
+enum KnowledgeType {
+  file
+  crawler
+  database
+  manual
+}
+
+enum KnowledgeStatus {
+  pending
+  processing
+  ready
+  failed
+}
+
+enum DocumentStatus {
+  pending
+  chunked
+  embedded
+  failed
+}
+
+enum RunStatus {
+  pending
+  running
+  completed
+  failed
+  cancelled
+  waiting_input
+}
+
+enum StepStatus {
+  pending
+  running
+  completed
+  failed
+  skipped
+}
+
+enum ToolType {
+  http
+  code
+  search
+  custom
+}
+
+enum MemoryScope {
+  project
+  workflow
+  run
+  agent
+  thread
+}
+
+// --- AgentStudio v2: Agentic AI Enums ---
+
+enum AgentType {
+  single
+  supervisor
+  worker
+  swarm_member
+}
+
+enum AgentArchitecture {
+  react
+  plan_execute
+  tool_calling
+  custom_graph
+}
+
+enum TeamTopology {
+  supervisor
+  swarm
+  sequential
+  parallel
+}
+
+enum InteractionType {
+  approval
+  input
+  choice
+  edit
+}
+
+enum InteractionStatus {
+  pending
+  approved
+  rejected
+  timed_out
+  cancelled
+}
+
+// Track G: Tool Groups
+enum ToolGroupType {
+  rest
+  code
+}
+
+// Track J: MCP Server
+enum McpTransport {
+  stdio
+  sse
+  streamable_http
+}
+
+enum McpStatus {
+  disconnected
+  connecting
+  connected
+  error
+}
+
+enum McpCredentialMode {
+  shared
+  per_user
+}
+
+enum ThreadStatus {
+  active
+  paused
+  completed
+  failed
+  archived
+}
+
+// Phase 10: 사용자 자격증명
+enum CredentialKind {
+  provider
+  tool
+  mcp
+}
+
+enum CredentialStatus {
+  active
+  invalid
+  expired
+}
+
+enum SlackRoutingMode {
+  channel // 채널에서 봇 멘션(@bot) 시
+  dm // 봇 DM 으로 받았을 때
+  both // 채널 멘션 + DM 모두
+}
+
+// ============================================================
+// User & Auth
+// ============================================================
+
+model User {
+  id          String     @id @default(uuid())
+  name        String
+  email       String     @unique
+  password    String
+  status      UserStatus @default(pending)
+  role        UserRole   @default(user)
+  avatarUrl   String?    @map("avatar_url")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  activatedAt DateTime?  @map("activated_at")
+
+  projectMembers   ProjectMember[]
+  workflowVersions WorkflowVersion[] @relation("VersionCreatedBy")
+  deployments      Deployment[]      @relation("DeploymentDeployedBy")
+  agentDeployments AgentDeployment[] @relation("AgentDeploymentDeployedBy")
+  refreshTokens    RefreshToken[]
+  skills           Skill[]
+  credentials      UserCredential[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ============================================================
+// Project
+// ============================================================
+
+model Project {
+  id              String            @id @default(uuid())
+  name            String
+  description     String            @default("")
+  slug            String            @unique
+  visibility      ProjectVisibility @default(private)
+  allowAllModels  Boolean           @default(true) @map("allow_all_models")
+  allowedModelIds String[]          @map("allowed_model_ids")
+  defaultModelId  String?           @map("default_model_id")
+  enabledBuiltins String[]          @default([]) @map("enabled_builtins")
+  builtinConfigs  Json              @default("{}") @map("builtin_configs")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  members                 ProjectMember[]
+  workflows               Workflow[]
+  environments            DeploymentEnvironment[]
+  deployments             Deployment[]
+  activityLogs            ProjectActivityLog[]
+  apiKeys                 ApiKey[]
+  tools                   Tool[]
+  toolGroups              ToolGroup[]
+  // AgentStudio v2
+  agents                  Agent[]
+  agentTeams              AgentTeam[]
+  threads                 Thread[]
+  knowledgeBases          KnowledgeBase[]
+  evalDatasets            EvalDataset[]
+  mcpServers              McpServer[]
+  workflowRuns            WorkflowRun[]
+  agentDeployments        AgentDeployment[]
+  slackChannelAgents      SlackChannelAgent[]
+  slackInstallations      SlackInstallation[]
+  naverWorksInstallations NaverWorksInstallation[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id          String       @id @default(uuid())
+  projectId   String       @map("project_id")
+  name        String
+  email       String
+  role        MemberRole   @default(viewer)
+  status      MemberStatus @default(invited)
+  avatarUrl   String?      @map("avatar_url")
+  joinedAt    DateTime?    @map("joined_at")
+  invitedAt   DateTime?    @map("invited_at")
+  invitedBy   String?      @map("invited_by")
+  expiresAt   DateTime?    @map("expires_at")
+  message     String?
+  declinedAt  DateTime?    @map("declined_at")
+  cancelledAt DateTime?    @map("cancelled_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [email], references: [email])
+
+  @@unique([projectId, email])
+  @@index([email])
+  @@index([projectId, status])
+  @@map("project_members")
+}
+
+model ProjectActivityLog {
+  id          String         @id @default(uuid())
+  projectId   String         @map("project_id")
+  action      ActivityAction
+  memberName  String         @map("member_name")
+  memberEmail String         @map("member_email")
+  performedBy String         @map("performed_by")
+  role        MemberRole?
+  message     String?
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt(sort: Desc)])
+  @@map("project_activity_logs")
+}
+
+// ============================================================
+// Provider & Model
+// ============================================================
+
+model Provider {
+  id               String       @id @default(uuid())
+  name             String
+  slug             String       @unique
+  type             ProviderType @default(cloud)
+  iconUrl          String?      @map("icon_url")
+  apiKeyConfigured Boolean      @default(false) @map("api_key_configured")
+  apiKeyEncrypted  String?      @map("api_key_encrypted")
+  endpoint         String?
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  models Model[]
+
+  @@map("providers")
+}
+
+model Model {
+  id            String   @id @default(uuid())
+  providerId    String   @map("provider_id")
+  modelId       String   @map("model_id")
+  name          String
+  contextWindow Int      @map("context_window")
+  inputPrice    Float    @map("input_price")
+  outputPrice   Float    @map("output_price")
+  capabilities  String[]
+  enabled       Boolean  @default(true)
+  isCustom      Boolean  @default(false) @map("is_custom")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, modelId])
+  @@index([enabled])
+  @@map("models")
+}
+
+// ============================================================
+// Workflow (AgentStudio v1)
+// ============================================================
+
+model Workflow {
+  id          String         @id @default(uuid())
+  projectId   String         @map("project_id")
+  name        String
+  slug        String
+  description String         @default("")
+  nodes       Json // WorkflowNode[]
+  edges       Json // WorkflowEdge[]
+  variables   Json // Variable[]
+  status      WorkflowStatus @default(draft)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions    WorkflowVersion[]
+  deployments Deployment[]
+  runs        WorkflowRun[]
+  endpoints   Endpoint[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@map("workflows")
+}
+
+model WorkflowVersion {
+  id         String   @id @default(uuid())
+  workflowId String   @map("workflow_id")
+  number     Int
+  label      String?
+  message    String
+  snapshot   Json
+  diff       Json?
+  createdBy  String   @map("created_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  workflow    Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  creator     User         @relation("VersionCreatedBy", fields: [createdBy], references: [id])
+  deployments Deployment[]
+  endpoints   Endpoint[]
+
+  @@unique([workflowId, number])
+  @@index([workflowId, number(sort: Desc)])
+  @@map("workflow_versions")
+}
+
+// ============================================================
+// Tool
+// ============================================================
+
+model ToolGroup {
+  id          String        @id @default(uuid())
+  projectId   String        @map("project_id")
+  name        String
+  description String        @default("")
+  type        ToolGroupType
+  enabled     Boolean       @default(true)
+  specUrl     String?       @map("spec_url")
+  authConfig  Json?         @map("auth_config")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tools   Tool[]
+
+  @@index([projectId])
+  @@map("tool_groups")
+}
+
+model Tool {
+  id             String   @id @default(uuid())
+  projectId      String   @map("project_id")
+  groupId        String?  @map("group_id")
+  name           String
+  slug           String
+  description    String   @default("")
+  type           ToolType
+  config         Json
+  inputSchema    Json     @map("input_schema")
+  outputSchema   Json     @map("output_schema")
+  functionSchema Json?    @map("function_schema") // OpenAI function-calling JSON Schema
+  labels         Json?    @map("labels") // HITL 카드 라벨 사전 — { "dotPath": "한국어 라벨" }
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  toolGroup ToolGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, slug])
+  @@index([projectId, enabled])
+  @@map("tools")
+}
+
+// ============================================================
+// MCP Server (Track J)
+// ============================================================
+
+model McpServer {
+  id                 String            @id @default(uuid())
+  projectId          String            @map("project_id")
+  name               String
+  description        String?
+  transport          McpTransport
+  config             Json
+  // stdio:         { command: string, args: string[], env: Record<string,string> }
+  // sse / http:    { url: string, headers: Record<string,string> }
+  status             McpStatus         @default(disconnected)
+  toolCount          Int?              @map("tool_count")
+  tools              Json? // [{name, description, inputSchema}] 캐시
+  credentialMode     McpCredentialMode @default(shared) @map("credential_mode")
+  requiredUserFields Json?             @map("required_user_fields")
+  // RequiredUserField[] = [{ key, label, secret?, placeholder?, required? }]
+  exposedTools       String[]          @default([]) @map("exposed_tools")
+  // 비어 있으면 전체 노출(하위 호환). 하나 이상이면 해당 tool name 만 노출.
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("mcp_servers")
+}
+
+// ============================================================
+// Slack Installation (워크스페이스별 봇 설치 — 토큰 저장)
+// ============================================================
+// 한 워크스페이스(team_id) 당 1 row. Socket Mode 시작 시 enabled=true 인 row 의
+// botToken/appToken 으로 Bolt App 부팅. 멀티 워크스페이스 확장 시 row 추가만으로 대응.
+model SlackInstallation {
+  id                String   @id @default(uuid())
+  projectId         String   @map("project_id")
+  installedByUserId String?  @map("installed_by_user_id") // 설치한 admin — Slack thread invoke 시 이 user 의 자격증명 사용
+  workspaceTeamId   String   @unique @map("workspace_team_id") // Slack team_id (T...)
+  workspaceName     String?  @map("workspace_name") // UI 표시용
+  botUserId         String?  @map("bot_user_id") // Slack 봇의 user id (U...) — 멘션 매칭에 사용
+  botTokenEnc       String   @map("bot_token_enc") @db.Text // xoxb-... (AES-256-GCM 암호화)
+  appTokenEnc       String   @map("app_token_enc") @db.Text // xapp-... (Socket Mode App-Level Token)
+  enabled           Boolean  @default(true)
+  installedAt       DateTime @default(now()) @map("installed_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("slack_installations")
+}
+
+// ============================================================
+// Slack Channel → Agent 라우팅 매핑
+// ============================================================
+// Slack Events(app_mention / message.im) 수신 시 어떤 Agent 가 답변할지 결정.
+// (workspaceTeamId + channelId + mode) 가 유니크 — 같은 채널을 두 Agent 에 동시 매핑할 수 없음.
+// mode=`both` 는 채널 멘션과 DM 모두 한 Agent 가 처리.
+model SlackChannelAgent {
+  id              String           @id @default(uuid())
+  projectId       String           @map("project_id")
+  workspaceTeamId String           @map("workspace_team_id") // Slack team_id (T...)
+  channelId       String           @map("channel_id") // Slack channel/IM id (C... / G... / D...)
+  channelName     String?          @map("channel_name") // 캐시용 (UI 표시)
+  agentId         String           @map("agent_id")
+  mode            SlackRoutingMode @default(channel)
+  enabled         Boolean          @default(true)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceTeamId, channelId, mode])
+  @@index([projectId])
+  @@index([agentId])
+  @@map("slack_channel_agents")
+}
+
+// ============================================================
+// NAVER WORKS Installation (Project별 봇 설치 — 1:1 DM 전용)
+// ============================================================
+// 한 Project 에 NAVER WORKS 봇을 등록한다. callback URL 은 botId 기준으로 라우팅하므로
+// botId 가 글로벌 unique. Service Account JWT(RS256) 로 토큰을 발급해 사용자 메시지
+// API(`/users/{userId}/messages`) 를 호출하므로 channelId 매핑 없이 1:1 DM 만 처리한다.
+// 봇 1개 = 에이전트 1개 매핑 (agentId 직접 보유). 시크릿은 모두 AES-256-GCM 으로 암호화.
+model NaverWorksInstallation {
+  id                String   @id @default(uuid())
+  projectId         String   @map("project_id")
+  installedByUserId String?  @map("installed_by_user_id") // 등록 admin — 도구 호출 시 자격증명 사용
+  agentId           String   @map("agent_id") // 봇 1개 = 에이전트 1개
+  botId             String   @unique @map("bot_id") // NAVER WORKS Bot ID — callback 라우팅 키
+  botName           String?  @map("bot_name") // UI 표시용
+  clientId          String   @map("client_id") // Developer Console Client ID
+  clientSecretEnc   String   @map("client_secret_enc") @db.Text // 암호화
+  serviceAccount    String   @map("service_account") // JWT sub (xxx@example.serviceaccount)
+  privateKeyEnc     String   @map("private_key_enc") @db.Text // PEM 본문 암호화
+  botSecretEnc      String   @map("bot_secret_enc") @db.Text // callback HMAC 키 (암호화)
+  scope             String   @default("bot bot.message") // OAuth scope
+  enabled           Boolean  @default(true)
+  installedAt       DateTime @default(now()) @map("installed_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent   @relation(fields: [agentId], references: [id], onDelete: Restrict)
+
+  @@index([projectId])
+  @@index([agentId])
+  @@map("naver_works_installations")
+}
+
+// ============================================================
+// Deployment Environment
+// ============================================================
+
+model DeploymentEnvironment {
+  id               String   @id @default(uuid())
+  projectId        String   @map("project_id")
+  name             String
+  slug             String
+  color            String
+  order            Int      @default(0)
+  approvalRequired Boolean  @default(false) @map("approval_required")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  project          Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deployments      Deployment[]
+  agentDeployments AgentDeployment[]
+
+  @@unique([projectId, slug])
+  @@index([projectId, order])
+  @@map("deployment_environments")
+}
+
+// ============================================================
+// Deployment
+// ============================================================
+
+model Deployment {
+  id            String           @id @default(uuid())
+  projectId     String           @map("project_id")
+  workflowId    String           @map("workflow_id")
+  workflowName  String           @map("workflow_name")
+  environmentId String           @map("environment_id")
+  environment   String
+  versionId     String           @map("version_id")
+  versionNumber Int              @map("version_number")
+  status        DeploymentStatus @default(active)
+  endpointPath  String           @map("endpoint_path")
+  trafficPolicy TrafficPolicy    @default(immediate) @map("traffic_policy")
+  canaryPercent Int?             @map("canary_percent")
+  deployedBy    String           @map("deployed_by")
+  deployedAt    DateTime         @default(now()) @map("deployed_at")
+
+  project   Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workflow  Workflow              @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  env       DeploymentEnvironment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  version   WorkflowVersion       @relation(fields: [versionId], references: [id])
+  deployer  User                  @relation("DeploymentDeployedBy", fields: [deployedBy], references: [id])
+  endpoints Endpoint[]
+
+  @@unique([workflowId, environmentId])
+  @@index([projectId])
+  @@map("deployments")
+}
+
+model DeploymentLog {
+  id           String           @id @default(uuid())
+  projectId    String           @map("project_id")
+  workflowId   String           @map("workflow_id")
+  workflowName String           @map("workflow_name")
+  action       DeploymentAction
+  fromVersion  Int?             @map("from_version")
+  toVersion    Int?             @map("to_version")
+  environment  String
+  performedBy  String           @map("performed_by")
+  performedAt  DateTime         @default(now()) @map("performed_at")
+  note         String?
+
+  @@index([projectId, performedAt(sort: Desc)])
+  @@map("deployment_logs")
+}
+
+// ============================================================
+// Agent Deployment (Phase 9-1)
+// ============================================================
+
+model AgentDeployment {
+  id            String           @id @default(uuid())
+  projectId     String           @map("project_id")
+  agentId       String           @map("agent_id")
+  environmentId String           @map("environment_id")
+  version       Int
+  status        DeploymentStatus @default(active)
+  publicPath    String           @map("public_path")
+  snapshot      Json
+  description   String?
+  deployedBy    String           @map("deployed_by")
+  deployedAt    DateTime         @default(now()) @map("deployed_at")
+  undeployedAt  DateTime?        @map("undeployed_at")
+
+  project Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent   Agent                 @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  env     DeploymentEnvironment @relation(fields: [environmentId], references: [id], onDelete: Cascade)
+  user    User                  @relation("AgentDeploymentDeployedBy", fields: [deployedBy], references: [id])
+  apiKeys ApiKey[]
+  threads Thread[]
+
+  @@unique([agentId, environmentId, version])
+  @@index([projectId])
+  @@index([agentId, status])
+  @@index([publicPath])
+  @@map("agent_deployments")
+}
+
+// ============================================================
+// Endpoint
+// ============================================================
+
+model Endpoint {
+  id            String         @id @default(uuid())
+  deploymentId  String         @map("deployment_id")
+  workflowId    String         @map("workflow_id")
+  workflowName  String         @map("workflow_name")
+  projectSlug   String         @default("") @map("project_slug")
+  workflowSlug  String         @map("workflow_slug")
+  path          String
+  method        String         @default("POST")
+  environment   String
+  versionNumber Int            @map("version_number")
+  versionId     String         @map("version_id")
+  variables     Json
+  description   String?
+  status        EndpointStatus @default(active)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  deployment Deployment      @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+  workflow   Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  version    WorkflowVersion @relation(fields: [versionId], references: [id])
+  runs       WorkflowRun[]
+
+  @@unique([projectSlug, workflowSlug, environment])
+  @@index([status])
+  @@map("endpoints")
+}
+
+// ============================================================
+// API Key
+// ============================================================
+
+model ApiKey {
+  id                String       @id @default(uuid())
+  name              String
+  keyHash           String       @unique @map("key_hash")
+  keyPrefix         String       @map("key_prefix")
+  keySuffix         String       @map("key_suffix")
+  projectId         String       @map("project_id")
+  environment       String
+  endpointIds       String[]     @map("endpoint_ids")
+  agentDeploymentId String?      @map("agent_deployment_id")
+  scopes            String[]
+  validFrom         DateTime?    @map("valid_from")
+  expiresAt         DateTime?    @map("expires_at")
+  enabled           Boolean      @default(true)
+  status            ApiKeyStatus @default(active)
+  createdAt         DateTime     @default(now()) @map("created_at")
+  lastUsedAt        DateTime?    @map("last_used_at")
+
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agentDeployment AgentDeployment? @relation(fields: [agentDeploymentId], references: [id], onDelete: SetNull)
+  runs            WorkflowRun[]
+
+  @@index([projectId])
+  @@index([status, enabled])
+  @@index([agentDeploymentId])
+  @@map("api_keys")
+}
+
+// ============================================================
+// Agent Execution (Workflow v1)
+// ============================================================
+
+model WorkflowRun {
+  id           String    @id @default(uuid())
+  workflowId   String?   @map("workflow_id")
+  agentId      String?   @map("agent_id")
+  threadId     String?   @map("thread_id")
+  projectId    String?   @map("project_id")
+  endpointId   String?   @map("endpoint_id")
+  apiKeyId     String?   @map("api_key_id")
+  modelId      String?   @map("model_id")
+  environment  String?
+  status       RunStatus @default(pending)
+  input        Json
+  output       Json?
+  errorMessage String?   @map("error_message")
+  totalCost    Float?    @map("total_cost")
+  totalTokens  Int?      @map("total_tokens")
+  totalSteps   Int?      @map("total_steps")
+  latencyMs    Int?      @map("latency_ms")
+  startedAt    DateTime  @default(now()) @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+
+  workflow Workflow?   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  agent    Agent?      @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  project  Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  endpoint Endpoint?   @relation(fields: [endpointId], references: [id], onDelete: SetNull)
+  apiKey   ApiKey?     @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  traces   StepTrace[]
+
+  @@index([workflowId, startedAt(sort: Desc)])
+  @@index([agentId, startedAt(sort: Desc)])
+  @@index([projectId, startedAt(sort: Desc)])
+  @@index([status, startedAt(sort: Desc)])
+  @@index([modelId, startedAt(sort: Desc)])
+  @@index([threadId, startedAt(sort: Desc)])
+  @@map("workflow_runs")
+}
+
+model StepTrace {
+  id           String     @id @default(uuid())
+  runId        String     @map("run_id")
+  stepId       String?    @map("step_id")
+  parentStepId String?    @map("parent_step_id")
+  depth        Int        @default(0)
+  nodeId       String     @map("node_id")
+  nodeName     String     @map("node_name")
+  nodeType     NodeType   @map("node_type")
+  status       StepStatus @default(pending)
+  input        Json
+  output       Json?
+  errorMessage String?    @map("error_message")
+  startedAt    DateTime   @default(now()) @map("started_at")
+  completedAt  DateTime?  @map("completed_at")
+  latency      Int?
+  cost         Float?
+  tokens       Int?
+  retries      Int        @default(0)
+
+  run WorkflowRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, startedAt])
+  @@map("step_traces")
+}
+
+// ============================================================
+// Memory
+// ============================================================
+
+model AgentMemory {
+  id        String      @id @default(uuid())
+  projectId String      @map("project_id")
+  scope     MemoryScope
+  scopeId   String      @map("scope_id")
+  agentId   String?     @map("agent_id")
+  key       String
+  value     Json
+  expiresAt DateTime?   @map("expires_at")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@unique([projectId, scope, scopeId, key])
+  @@index([projectId, scope, scopeId])
+  @@index([agentId])
+  @@map("agent_memory")
+}
+
+// DeepAgent SDK 전용 장기 메모리 테이블
+model DeepAgentMemory {
+  id        String   @id @default(uuid())
+  agentId   String   @map("agent_id")
+  threadId  String   @map("thread_id")
+  type      String
+  content   String   @db.Text
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([agentId, threadId])
+  @@map("deep_agent_memory")
+}
+
+// ============================================================
+// Monitoring
+// ============================================================
+model DailyMetric {
+  id         String   @id @default(uuid())
+  date       DateTime @db.Date
+  projectId  String?  @map("project_id")
+  workflowId String?  @map("workflow_id")
+  endpointId String?  @map("endpoint_id")
+  calls      Int      @default(0)
+  tokens     Int      @default(0)
+  cost       Float    @default(0)
+  avgLatency Float    @default(0) @map("avg_latency")
+  errors     Int      @default(0)
+
+  @@unique([date, projectId, workflowId, endpointId])
+  @@index([date(sort: Desc)])
+  @@index([projectId, date(sort: Desc)])
+  @@index([workflowId, date(sort: Desc)])
+  @@map("daily_metrics")
+}
+
+// ============================================================
+// AgentStudio v2: Agentic AI Models
+// ============================================================
+
+model Agent {
+  id              String            @id @default(uuid())
+  projectId       String            @map("project_id")
+  name            String
+  slug            String
+  description     String            @default("")
+  type            AgentType         @default(single)
+  architecture    AgentArchitecture @default(react)
+  systemPrompt    String            @map("system_prompt") @db.Text
+  modelId         String            @map("model_id")
+  toolIds         String[]          @map("tool_ids")
+  toolGroupIds    String[]          @default([]) @map("tool_group_ids")
+  mcpServerIds    String[]          @map("mcp_server_ids")
+  builtinToolIds  String[]          @default([]) @map("builtin_tool_ids")
+  skillIds        String[]          @default([]) @map("skill_ids")
+  graphDefinition Json?             @map("graph_definition")
+  config          Json              @default("{}")
+  hitlPolicy      Json?             @map("hitl_policy")
+  enabled         Boolean           @default(true)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  // Step 0: 신규 필드
+  reasoningConfig  Json? @map("reasoning_config")
+  memoryConfig     Json? @map("memory_config")
+  guardrailsConfig Json? @map("guardrails_config")
+  planningConfig   Json? @map("planning_config")
+  outputSchema     Json? @map("output_schema")
+  toolPermissions  Json? @map("tool_permissions")
+  mcpToolRefs      Json? @map("mcp_tool_refs")
+  // [{ serverId: string, toolName: string }] — 도구 단위 선택.
+  // null 또는 빈 배열이면 mcpServerIds 의 전체 도구 사용(하위 호환).
+
+  project                 Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  teamAgents              TeamAgent[]
+  threads                 Thread[]
+  promptVersions          PromptVersion[]
+  knowledgeBases          AgentKnowledge[]
+  workflowRuns            WorkflowRun[]
+  deployments             AgentDeployment[]
+  slackChannelAgents      SlackChannelAgent[]
+  naverWorksInstallations NaverWorksInstallation[]
+
+  @@unique([projectId, slug])
+  @@index([projectId, enabled])
+  @@map("agents")
+}
+
+model AgentTeam {
+  id          String       @id @default(uuid())
+  projectId   String       @map("project_id")
+  name        String
+  slug        String
+  description String       @default("")
+  topology    TeamTopology @default(supervisor)
+  config      Json         @default("{}")
+  enabled     Boolean      @default(true)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  project        Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  teamAgents     TeamAgent[] @relation("ParentTeam")
+  subTeamMembers TeamAgent[] @relation("SubTeam")
+  threads        Thread[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@map("agent_teams")
+}
+
+model TeamAgent {
+  id               String  @id @default(uuid())
+  teamId           String  @map("team_id")
+  agentId          String? @map("agent_id")
+  subTeamId        String? @map("sub_team_id")
+  role             String  @default("worker")
+  routingCondition String? @map("routing_condition")
+  order            Int     @default(0)
+
+  team    AgentTeam  @relation("ParentTeam", fields: [teamId], references: [id], onDelete: Cascade)
+  agent   Agent?     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  subTeam AgentTeam? @relation("SubTeam", fields: [subTeamId], references: [id], onDelete: SetNull)
+
+  @@map("team_agents")
+}
+
+model Thread {
+  id                String       @id @default(uuid())
+  projectId         String       @map("project_id")
+  agentId           String?      @map("agent_id")
+  teamId            String?      @map("team_id")
+  agentDeploymentId String?      @map("agent_deployment_id")
+  title             String?
+  status            ThreadStatus @default(active)
+  metadata          Json         @default("{}")
+  userId            String?      @map("user_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent           Agent?             @relation(fields: [agentId], references: [id])
+  team            AgentTeam?         @relation(fields: [teamId], references: [id])
+  agentDeployment AgentDeployment?   @relation(fields: [agentDeploymentId], references: [id], onDelete: SetNull)
+  interactions    HumanInteraction[]
+  attachments     ThreadAttachment[]
+
+  @@index([projectId, status])
+  @@index([agentId])
+  @@index([userId])
+  @@index([agentDeploymentId])
+  @@map("threads")
+}
+
+model ThreadAttachment {
+  id           String   @id @default(uuid())
+  threadId     String   @map("thread_id")
+  uploaderId   String?  @map("uploader_id")
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  size         Int
+  storagePath  String   @map("storage_path")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+  @@map("thread_attachments")
+}
+
+model HumanInteraction {
+  id            String            @id @default(uuid())
+  threadId      String            @map("thread_id")
+  nodeId        String            @map("node_id")
+  type          InteractionType
+  status        InteractionStatus @default(pending)
+  prompt        String            @db.Text
+  options       Json?
+  agentContext  Json?             @map("agent_context")
+  response      Json?
+  respondedBy   String?           @map("responded_by")
+  timeoutAt     DateTime?         @map("timeout_at")
+  timeoutAction String?           @map("timeout_action")
+  escalateTo    String?           @map("escalate_to")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  respondedAt   DateTime?         @map("responded_at")
+
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, status])
+  @@index([status, createdAt])
+  @@map("human_interactions")
+}
+
+// ============================================================
+// Step 0: Prompt Version
+// ============================================================
+
+model PromptVersion {
+  id              String   @id @default(uuid())
+  agentId         String   @map("agent_id")
+  version         Int
+  systemPrompt    String   @map("system_prompt") @db.Text
+  fewShotExamples Json     @default("[]") @map("few_shot_examples")
+  variables       String[]
+  snapshot        String   @db.Text
+  diff            String?  @db.Text
+  createdBy       String?  @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, version])
+  @@index([agentId, version(sort: Desc)])
+  @@map("prompt_versions")
+}
+
+// ============================================================
+// Step 0: Knowledge (RAG)
+// ============================================================
+
+model KnowledgeBase {
+  id          String          @id @default(uuid())
+  projectId   String          @map("project_id")
+  name        String
+  description String?
+  type        KnowledgeType
+  status      KnowledgeStatus @default(pending)
+  config      Json // EmbeddingConfig
+  metadata    Json?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  documents Document[]
+  agents    AgentKnowledge[]
+
+  @@index([projectId, status])
+  @@map("knowledge_bases")
+}
+
+model AgentKnowledge {
+  agentId         String @map("agent_id")
+  knowledgeBaseId String @map("knowledge_base_id")
+  topK            Int    @default(5) @map("top_k")
+  scoreThreshold  Float  @default(0.7) @map("score_threshold")
+
+  agent         Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  knowledgeBase KnowledgeBase @relation(fields: [knowledgeBaseId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, knowledgeBaseId])
+  @@map("agent_knowledge")
+}
+
+model Document {
+  id              String         @id @default(uuid())
+  knowledgeBaseId String         @map("knowledge_base_id")
+  name            String
+  type            String // pdf, csv, txt, html, md, url
+  content         String?        @db.Text
+  fileSize        Int?           @map("file_size")
+  metadata        Json?
+  status          DocumentStatus @default(pending)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  knowledgeBase KnowledgeBase @relation(fields: [knowledgeBaseId], references: [id], onDelete: Cascade)
+  chunks        Chunk[]
+
+  @@index([knowledgeBaseId, status])
+  @@map("documents")
+}
+
+model Chunk {
+  id         String   @id @default(uuid())
+  documentId String   @map("document_id")
+  content    String   @db.Text
+  embedding  Float[]
+  metadata   Json?
+  tokenCount Int?     @map("token_count")
+  chunkIndex Int      @map("chunk_index")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, chunkIndex])
+  @@map("chunks")
+}
+
+// ============================================================
+// Step 0: Evaluation
+// ============================================================
+
+model EvalDataset {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testCases EvalTestCase[]
+  runs      EvalRun[]
+
+  @@index([projectId])
+  @@map("eval_datasets")
+}
+
+model EvalTestCase {
+  id        String   @id @default(uuid())
+  datasetId String   @map("dataset_id")
+  input     Json
+  expected  Json?
+  metadata  Json?
+  caseOrder Int      @default(0) @map("case_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  dataset EvalDataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  results EvalResult[]
+
+  @@index([datasetId, caseOrder])
+  @@map("eval_test_cases")
+}
+
+model EvalRun {
+  id          String    @id @default(uuid())
+  datasetId   String    @map("dataset_id")
+  agentId     String?   @map("agent_id")
+  workflowId  String?   @map("workflow_id")
+  name        String?
+  config      Json
+  status      RunStatus @default(pending)
+  summary     Json?
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  dataset EvalDataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  results EvalResult[]
+
+  @@index([datasetId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("eval_runs")
+}
+
+model EvalResult {
+  id           String    @id @default(uuid())
+  runId        String    @map("run_id")
+  testCaseId   String    @map("test_case_id")
+  output       Json
+  scores       Json
+  judgeOutput  Json?     @map("judge_output")
+  status       RunStatus
+  latencyMs    Int?      @map("latency_ms")
+  inputTokens  Int?      @map("input_tokens")
+  outputTokens Int?      @map("output_tokens")
+  costUsd      Float?    @map("cost_usd")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  run      EvalRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  testCase EvalTestCase @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@map("eval_results")
+}
+
+// ============================================================
+// Skills (deepagents 공식 Skills 시스템)
+// ============================================================
+
+model Skill {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  name         String
+  description  String   @default("") @db.Text
+  instructions String   @default("") @db.Text
+  allowedTools String[] @default([]) @map("allowed_tools")
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files SkillFile[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("skills")
+}
+
+model SkillFile {
+  id        String   @id @default(uuid())
+  skillId   String   @map("skill_id")
+  path      String
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, path])
+  @@index([skillId])
+  @@map("skill_files")
+}
+
+// ============================================================
+// User Credentials (Phase 10-3)
+// ============================================================
+
+model UserCredential {
+  id             String           @id @default(uuid())
+  userId         String           @map("user_id")
+  kind           CredentialKind
+  targetId       String           @map("target_id")
+  label          String           @default("")
+  valueEnc       String           @map("value_enc") @db.Text
+  metadata       Json?
+  status         CredentialStatus @default(active)
+  lastVerifiedAt DateTime?        @map("last_verified_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, kind, targetId, label])
+  @@index([userId, kind])
+  @@map("user_credentials")
+}
+
+// ============================================================
+// Card Definitions — Adaptive Cards(OSS) 기반 동적 카드 시스템
+// payload = Adaptive Card JSON (adaptivecards-templating 의 ${} 바인딩 사용 가능).
+// sampleData = 빌더 미리보기/런타임 fallback 용 샘플 데이터.
+// 이벤트의 presentation.cardDefinitionId/version 으로 참조되며
+// 프론트가 (cardId, version) 으로 immutable 캐싱.
+// ============================================================
+
+model CardDefinition {
+  id          String   @id @default(cuid())
+  cardId      String   @map("card_id") // 사용자 정의 키 (hitl-input-card 등)
+  version     Int
+  tenantId    String?  @map("tenant_id") // 멀티테넌트 분리 (1차에서는 null 허용)
+  name        String
+  category    String   @default("hitl") // hitl — (response 카테고리는 폐기)
+  /** 디자인 레이아웃 id — hitl-layouts.tsx 의 HITL_LAYOUTS 항목 중 하나. */
+  layout      String   @default("sky-standard")
+  /** 매칭할 도구 이름 배열. 비어 있으면 generic (모든 도구 fallback). */
+  targetTools String[] @default([]) @map("target_tools")
+  /** 도구 인자 별 라벨/위젯/도움말 정의. null = 슬롯이 typeof introspection 으로 fallback. */
+  argSchema   Json?    @map("arg_schema")
+  payload     Json     // Adaptive Card payload (template)
+  sampleData  Json     @default("{}") @map("sample_data") // 미리보기/fallback 샘플 데이터
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([cardId, version])
+  @@index([cardId])
+  @@index([tenantId])
+  @@map("card_definitions")
+}

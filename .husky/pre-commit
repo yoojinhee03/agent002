@@ -1,0 +1,7 @@
+# --no-stash: lint-staged 가 commit 직전에 unstaged 변경을 stash 했다가 복원하면서
+# 짧은 시간 안에 파일 시스템을 두 번 흔드는 동작을 비활성화한다. 이 round-trip 이
+# `nest start --watch` 의 재컴파일을 매번 두 번 트리거하면서 28001 포트 listen race
+# (EADDRINUSE) 를 일으켜 NestJS dev 서버가 죽는 회귀가 반복되었다.
+# 우리 lint 룰은 `lint --quiet`(검증만, 자동 fix 안 함) 이라 파일 변경이 없어서
+# stash 가 사실상 의미 없는 round-trip 이고, 끄더라도 사용자 데이터 손실 위험 없음.
+pnpm lint-staged --no-stash

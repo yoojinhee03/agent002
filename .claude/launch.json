@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "agent-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@agent-studio/web", "dev"],
+      "port": 28002,
+      "autoPort": false
+    }
+  ]
+}
